@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=UnifrakturMaguntia&family=IM+Fell+English:ital@0;1&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Bebas+Neue&family=Press+Start+2P&family=Spectral:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <style>
 :root{
   --bg:#07080e;--panel:#0d0f18;--panel2:#131620;
@@ -19,11 +20,10 @@
   --red:#e05252;--green:#4caf82;--blue:#3a6bc4;
   --topbar-h:50px;
   --lp-w:265px;--rp-w:295px;
-  --mob-panel-h:260px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;font-family:'Crimson Pro',Georgia,serif;touch-action:manipulation;}
-body{background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+body{background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100dvh;overflow:hidden;}
 
 /* ─── TOPBAR ─── */
 .topbar{height:var(--topbar-h);background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;padding:0 10px;flex-shrink:0;z-index:200;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
@@ -35,20 +35,20 @@ body{background:var(--bg);color:var(--text);display:flex;flex-direction:column;h
 .tbtn.gold{background:var(--gold);border-color:var(--gold);color:#1a1000;font-weight:700;}
 .tbtn.gold:hover{background:var(--gold2);}
 .tbtn.green{background:var(--green);border-color:var(--green);color:#001a0a;font-weight:700;}
+.tbtn.scan{background:rgba(58,107,196,.2);border-color:rgba(58,107,196,.6);color:#7aabff;font-weight:700;}
+.tbtn.scan:hover,.tbtn.scan:active{background:rgba(58,107,196,.35);border-color:#7aabff;color:#fff;}
 .tbtn.danger{border-color:rgba(224,82,82,.3);color:var(--red);}
 .tbtn.danger:hover,.tbtn.danger:active{background:rgba(224,82,82,.1);}
 .spacer{flex:1;min-width:8px;}
 select.tbtn{cursor:pointer;}
 select.tbtn option{background:#1a1a2e;}
 
-/* ─── HAMBURGER (mobile) ─── */
-.ham-btn{display:none;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted2);padding:6px 9px;cursor:pointer;font-size:16px;flex-shrink:0;}
-
 /* ─── LAYOUT DESKTOP ─── */
-.layout{display:grid;grid-template-columns:var(--lp-w) 1fr var(--rp-w);flex:1;overflow:hidden;min-height:0;}
+/* canvas-wrap prend TOUT l'espace restant en hauteur */
+.layout{display:grid;grid-template-columns:var(--lp-w) 1fr var(--rp-w);flex:1;min-height:0;overflow:hidden;}
 
 /* ─── LEFT PANEL ─── */
-.lpanel{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:transform .25s ease;}
+.lpanel{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;}
 .lptabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
 .lptab{flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted2);font-family:'Crimson Pro',serif;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:9px 2px;cursor:pointer;transition:all .15s;}
 .lptab.on{color:var(--gold2);border-bottom-color:var(--gold);}
@@ -61,7 +61,6 @@ select.tbtn option{background:#1a1a2e;}
 .bgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:2px;}
 .bchip{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:9px 6px;cursor:pointer;text-align:center;user-select:none;transition:all .15s;}
 .bchip:hover,.bchip:active{border-color:var(--gold);background:rgba(201,168,76,.07);}
-
 .bchip-ico{font-size:18px;display:block;margin-bottom:3px;}
 .bchip-lbl{font-size:9px;letter-spacing:.5px;color:var(--muted2);}
 
@@ -104,10 +103,20 @@ input[type=range]{accent-color:var(--gold);width:100%;}
 .grad-preview{height:20px;border-radius:4px;margin-bottom:6px;border:1px solid var(--border);}
 
 /* ─── CANVAS ─── */
-.canvas-wrap{background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:auto;position:relative;-webkit-overflow-scrolling:touch;}
+/* La carte doit toujours être entièrement visible */
+.canvas-wrap{
+  background:var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
+  min-height:0;
+  min-width:0;
+}
 .canvas-wrap::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
-.card-scene{position:relative;z-index:1;}
-#card{position:relative;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.1);cursor:default;user-select:none;}
+.card-scene{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#card{position:relative;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.1);cursor:default;user-select:none;flex-shrink:0;}
 #card-bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;}
 #card-grad{position:absolute;inset:0;z-index:1;pointer-events:none;}
 #card-pat{position:absolute;inset:0;z-index:2;pointer-events:none;}
@@ -124,7 +133,7 @@ input[type=range]{accent-color:var(--gold);width:100%;}
 .blk.sel .rh{display:block;}
 
 /* ─── RIGHT PANEL ─── */
-.rpanel{background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:transform .25s ease;}
+.rpanel{background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;}
 .rpanel-title{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding:12px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .rscroll{flex:1;overflow-y:auto;padding:12px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;-webkit-overflow-scrolling:touch;}
 .rscroll::-webkit-scrollbar{width:3px;}
@@ -229,6 +238,56 @@ select.pinp option{background:#1a1a2e;}
 .fiche-faute-date{font-size:10px;color:var(--muted2);}
 .fiche-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.1));border:1px solid rgba(201,168,76,.4);border-radius:20px;padding:4px 12px;font-family:'Cinzel',serif;font-size:10px;color:var(--gold2);letter-spacing:2px;margin-bottom:14px;}
 
+/* ─── SCANNER QR ─── */
+.scanner-overlay{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:3000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:16px;}
+.scanner-overlay.show{display:flex;}
+.scanner-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;color:var(--gold2);text-align:center;}
+.scanner-box{position:relative;width:min(300px,75vw);height:min(300px,75vw);flex-shrink:0;}
+.scanner-video{width:100%;height:100%;object-fit:cover;border-radius:16px;display:block;background:#000;}
+.scanner-frame{position:absolute;inset:0;border-radius:16px;pointer-events:none;}
+.scanner-corner{position:absolute;width:28px;height:28px;border-color:var(--gold2);border-style:solid;}
+.sc-tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:8px 0 0 0;}
+.sc-tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 8px 0 0;}
+.sc-bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 8px;}
+.sc-br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 8px 0;}
+.scanner-line{position:absolute;left:8%;width:84%;height:2px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);animation:scanline 2s ease-in-out infinite;top:10%;border-radius:2px;}
+@keyframes scanline{0%,100%{top:10%;opacity:.6;}50%{top:84%;opacity:1;}}
+.scanner-status{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold2);text-align:center;padding:9px 22px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:10px;max-width:300px;word-break:break-word;}
+.scanner-status.success{color:var(--green);border-color:rgba(76,175,130,.5);background:rgba(76,175,130,.1);animation:pulse-ok .5s ease;}
+.scanner-status.error{color:var(--red);border-color:rgba(224,82,82,.5);background:rgba(224,82,82,.08);}
+@keyframes pulse-ok{0%{transform:scale(.97);}50%{transform:scale(1.03);}100%{transform:scale(1);}}
+.scanner-hint{font-size:11px;color:var(--muted2);text-align:center;max-width:280px;line-height:1.6;font-family:'Crimson Pro',serif;}
+.scanner-cam-select{background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Crimson Pro',serif;font-size:12px;padding:5px 8px;cursor:pointer;max-width:260px;outline:none;}
+.scanner-cam-select option{background:#1a1a2e;}
+.scanner-close{background:none;border:1px solid rgba(255,255,255,.12);border-radius:8px;color:var(--muted2);font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;padding:9px 24px;cursor:pointer;transition:all .15s;}
+.scanner-close:hover,.scanner-close:active{border-color:var(--gold);color:var(--gold2);}
+
+/* Résultat inline dans scanner */
+.scanner-result-inline{
+  background:linear-gradient(135deg,#0d1f3c,#1a2a50);
+  border:1px solid rgba(201,168,76,.4);
+  border-radius:14px;
+  padding:16px 20px;
+  width:min(340px,88vw);
+  max-height:50vh;
+  overflow-y:auto;
+  box-shadow:0 0 40px rgba(201,168,76,.2);
+}
+.sri-name{font-family:'Cinzel',serif;font-size:16px;color:var(--gold2);font-weight:700;margin-bottom:4px;}
+.sri-mat{font-size:11px;color:var(--muted2);letter-spacing:2px;margin-bottom:10px;}
+.sri-bio{font-size:12px;color:var(--muted2);font-style:italic;margin-bottom:10px;line-height:1.5;}
+.sri-stats{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+.sri-stat{display:flex;align-items:center;gap:6px;}
+.sri-stat-name{font-size:11px;color:var(--muted2);min-width:80px;}
+.sri-stat-bar{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;}
+.sri-stat-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));}
+.sri-stat-val{font-size:10px;color:var(--gold2);min-width:22px;text-align:right;}
+.sri-faute{font-size:11px;color:rgba(224,82,82,.9);padding:4px 8px;background:rgba(224,82,82,.08);border-radius:4px;margin-bottom:3px;}
+.sri-btn-row{display:flex;gap:8px;margin-top:10px;}
+.sri-btn{flex:1;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:7px;color:var(--gold2);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;padding:8px;cursor:pointer;transition:all .15s;}
+.sri-btn:hover,.sri-btn:active{background:rgba(201,168,76,.3);}
+.sri-btn.danger{background:rgba(224,82,82,.1);border-color:rgba(224,82,82,.3);color:var(--red);}
+
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--gold);color:#1a1000;padding:9px 20px;border-radius:7px;font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:2px;opacity:0;pointer-events:none;transition:all .28s;z-index:9999;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
@@ -252,47 +311,46 @@ select.pinp option{background:#1a1a2e;}
 .mob-panel-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .mob-panel-close{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted2);font-size:18px;cursor:pointer;}
 
-/* ─── OVERLAY BACKDROP (mobile panels) ─── */
 .panel-backdrop{display:none;position:fixed;inset:0;z-index:290;background:rgba(0,0,0,.5);}
 .panel-backdrop.show{display:block;}
 
-/* ─── TABLET: side-by-side avec panneau rétractable ─── */
-@media (max-width: 1024px) and (min-width: 641px){
-  :root{--lp-w:220px;--rp-w:240px;}
-  .logo{font-size:11px;letter-spacing:3px;}
+/* ══════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════ */
+@media (min-width: 1400px){
+  :root{--lp-w:290px;--rp-w:320px;--topbar-h:54px;}
 }
-
-/* ─── MOBILE ─── */
+@media (max-width: 1024px) and (min-width: 769px){
+  :root{--lp-w:210px;--rp-w:230px;--topbar-h:46px;}
+}
+@media (max-width: 768px) and (min-width: 641px){
+  :root{--lp-w:180px;--rp-w:200px;--topbar-h:44px;}
+  .tbtn-hide-mob{display:none;}
+  .sep-mob{display:none;}
+}
 @media (max-width: 640px){
   :root{--topbar-h:44px;}
-  .layout{grid-template-columns:1fr;grid-template-rows:1fr;}
+  .layout{display:flex;}
   .lpanel{display:none;}
   .rpanel{display:none;}
+  .canvas-wrap{flex:1;}
   .mob-toolbar{display:flex;flex-direction:column;}
   .mob-panel{display:flex;}
   .topbar{padding:0 8px;gap:4px;}
-  .logo{font-size:10px;letter-spacing:2px;}
   .tbtn-hide-mob{display:none;}
-  .ham-btn{display:flex;}
   .sep-mob{display:none;}
-  .canvas-wrap{flex:1;align-items:flex-start;padding:12px;}
-  #card{border-radius:10px;}
-  .toast{font-size:11px;padding:8px 16px;bottom:80px;}
-  .modal{border-radius:0 0 0 0;max-height:100vh;border-radius:14px;}
+  .toast{bottom:80px;}
+  .scanner-box{width:min(280px,78vw);height:min(280px,78vw);}
 }
-
-/* ─── Très petits écrans ─── */
-@media (max-width: 380px){
-  :root{--topbar-h:40px;}
-  .logo{display:none;}
-  .tbtn{font-size:10px;padding:4px 7px;}
+@media (max-width: 420px){
+  .scanner-box{width:min(250px,74vw);height:min(250px,74vw);}
+  .scanner-status{font-size:10px;padding:7px 14px;}
 }
-
-/* ─── Paysage mobile ─── */
-@media (max-width: 812px) and (orientation:landscape) and (max-height:420px){
-  :root{--topbar-h:38px;}
-  .mob-panel{max-height:85vh;}
-  .mob-toolbar .mob-tabs{height:40px;}
+@media (max-height:500px) and (orientation:landscape){
+  .scanner-overlay{gap:8px;}
+  .scanner-box{width:min(180px,38vw);height:min(180px,38vw);}
+  .scanner-hint{display:none;}
+  .scanner-result-inline{max-height:40vh;}
 }
 </style>
 </head>
@@ -302,7 +360,6 @@ select.pinp option{background:#1a1a2e;}
 <div class="topbar">
   <div class="logo">✦ CARTE DE POTE</div>
   <div class="sep"></div>
-  <!-- Visible desktop/tablette -->
   <button class="tbtn tbtn-hide-mob" onclick="loadTpl('classic')">🎴</button>
   <button class="tbtn tbtn-hide-mob" onclick="loadTpl('contre')">📜</button>
   <button class="tbtn tbtn-hide-mob" onclick="loadTpl('legend')">👑</button>
@@ -316,6 +373,8 @@ select.pinp option{background:#1a1a2e;}
     <option value="400,600">Portrait</option>
   </select>
   <div class="spacer"></div>
+  <button class="tbtn scan" onclick="openScanner()" title="Scanner un QR Code de profil">📷 Scanner QR</button>
+  <div class="sep tbtn-hide-mob"></div>
   <button class="tbtn green tbtn-hide-mob" onclick="openSaveModal()">💾</button>
   <button class="tbtn tbtn-hide-mob" onclick="switchLP('saves',null)">📂</button>
   <div class="sep sep-mob"></div>
@@ -325,7 +384,7 @@ select.pinp option{background:#1a1a2e;}
 
 <div class="layout">
 
-<!-- LEFT PANEL (desktop/tablet) -->
+<!-- LEFT PANEL -->
 <div class="lpanel" id="lpanel-main">
   <div class="lptabs">
     <button class="lptab on" onclick="switchLP('blocks',this)">Blocs</button>
@@ -337,25 +396,25 @@ select.pinp option{background:#1a1a2e;}
   <div class="lscroll" id="lp-blocks">
     <div class="catlabel">📝 Texte</div>
     <div class="bgrid">
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'titre')" onclick="addBlock('titre',20,20)"><span class="bchip-ico">🔤</span><span class="bchip-lbl">Titre</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'soustitre')" onclick="addBlock('soustitre',20,60)"><span class="bchip-ico">✏️</span><span class="bchip-lbl">Sous-titre</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'texte')" onclick="addBlock('texte',20,90)"><span class="bchip-ico">📄</span><span class="bchip-lbl">Texte libre</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'label')" onclick="addBlock('label',20,20)"><span class="bchip-ico">🏷️</span><span class="bchip-lbl">Label</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'badge')" onclick="addBlock('badge',20,20)"><span class="bchip-ico">💠</span><span class="bchip-lbl">Badge</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'nom')" onclick="addBlock('nom',20,20)"><span class="bchip-ico">👤</span><span class="bchip-lbl">Nom</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'citation')" onclick="addBlock('citation',20,60)"><span class="bchip-ico">💬</span><span class="bchip-lbl">Citation</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'serial')" onclick="addBlock('serial',20,20)"><span class="bchip-ico">🔢</span><span class="bchip-lbl">N° série</span></div>
+      <div class="bchip" onclick="addBlock('titre',20,20)"><span class="bchip-ico">🔤</span><span class="bchip-lbl">Titre</span></div>
+      <div class="bchip" onclick="addBlock('soustitre',20,60)"><span class="bchip-ico">✏️</span><span class="bchip-lbl">Sous-titre</span></div>
+      <div class="bchip" onclick="addBlock('texte',20,90)"><span class="bchip-ico">📄</span><span class="bchip-lbl">Texte libre</span></div>
+      <div class="bchip" onclick="addBlock('label',20,20)"><span class="bchip-ico">🏷️</span><span class="bchip-lbl">Label</span></div>
+      <div class="bchip" onclick="addBlock('badge',20,20)"><span class="bchip-ico">💠</span><span class="bchip-lbl">Badge</span></div>
+      <div class="bchip" onclick="addBlock('nom',20,20)"><span class="bchip-ico">👤</span><span class="bchip-lbl">Nom</span></div>
+      <div class="bchip" onclick="addBlock('citation',20,60)"><span class="bchip-ico">💬</span><span class="bchip-lbl">Citation</span></div>
+      <div class="bchip" onclick="addBlock('serial',20,20)"><span class="bchip-ico">🔢</span><span class="bchip-lbl">N° série</span></div>
     </div>
     <div class="catlabel">📋 Tableaux & Listes</div>
     <div class="bgrid">
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'checklist')" onclick="addBlock('checklist',20,60)"><span class="bchip-ico">✅</span><span class="bchip-lbl">Checklist</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'tableau')" onclick="addBlock('tableau',20,60)"><span class="bchip-ico">📊</span><span class="bchip-lbl">Tableau</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'regles')" onclick="addBlock('regles',20,60)"><span class="bchip-ico">📜</span><span class="bchip-lbl">Règles</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'infobox')" onclick="addBlock('infobox',20,60)"><span class="bchip-ico">🗂️</span><span class="bchip-lbl">Info-box</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'stats')" onclick="addBlock('stats',20,60)"><span class="bchip-ico">📈</span><span class="bchip-lbl">Stats</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'etoiles')" onclick="addBlock('etoiles',20,60)"><span class="bchip-ico">⭐</span><span class="bchip-lbl">Étoiles</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'jauge')" onclick="addBlock('jauge',20,60)"><span class="bchip-ico">🔋</span><span class="bchip-lbl">Jauge</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'consignes')" onclick="addBlock('consignes',20,60)"><span class="bchip-ico">⚠️</span><span class="bchip-lbl">Consignes</span></div>
+      <div class="bchip" onclick="addBlock('checklist',20,60)"><span class="bchip-ico">✅</span><span class="bchip-lbl">Checklist</span></div>
+      <div class="bchip" onclick="addBlock('tableau',20,60)"><span class="bchip-ico">📊</span><span class="bchip-lbl">Tableau</span></div>
+      <div class="bchip" onclick="addBlock('regles',20,60)"><span class="bchip-ico">📜</span><span class="bchip-lbl">Règles</span></div>
+      <div class="bchip" onclick="addBlock('infobox',20,60)"><span class="bchip-ico">🗂️</span><span class="bchip-lbl">Info-box</span></div>
+      <div class="bchip" onclick="addBlock('stats',20,60)"><span class="bchip-ico">📈</span><span class="bchip-lbl">Stats</span></div>
+      <div class="bchip" onclick="addBlock('etoiles',20,60)"><span class="bchip-ico">⭐</span><span class="bchip-lbl">Étoiles</span></div>
+      <div class="bchip" onclick="addBlock('jauge',20,60)"><span class="bchip-ico">🔋</span><span class="bchip-lbl">Jauge</span></div>
+      <div class="bchip" onclick="addBlock('consignes',20,60)"><span class="bchip-ico">⚠️</span><span class="bchip-lbl">Consignes</span></div>
     </div>
     <div class="catlabel">🖼️ Images</div>
     <div class="bgrid">
@@ -364,21 +423,21 @@ select.pinp option{background:#1a1a2e;}
     </div>
     <div class="catlabel">🎨 Déco</div>
     <div class="bgrid">
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'icone')" onclick="addBlock('icone',20,20)"><span class="bchip-ico">🌟</span><span class="bchip-lbl">Icône emoji</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'iconrow')" onclick="addBlock('iconrow',20,20)"><span class="bchip-ico">🎭</span><span class="bchip-lbl">Rangée</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'separateur')" onclick="addBlock('separateur',20,60)"><span class="bchip-ico">➖</span><span class="bchip-lbl">Séparateur</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'cadre')" onclick="addBlock('cadre',20,60)"><span class="bchip-ico">🔲</span><span class="bchip-lbl">Cadre</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'ruban')" onclick="addBlock('ruban',20,60)"><span class="bchip-ico">🎀</span><span class="bchip-lbl">Ruban</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'tampon')" onclick="addBlock('tampon',20,60)"><span class="bchip-ico">🔵</span><span class="bchip-lbl">Tampon</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'coin')" onclick="addBlock('coin',20,20)"><span class="bchip-ico">🔱</span><span class="bchip-lbl">Coin déco</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'filigrane')" onclick="addBlock('filigrane',20,60)"><span class="bchip-ico">💧</span><span class="bchip-lbl">Filigrane</span></div>
+      <div class="bchip" onclick="addBlock('icone',20,20)"><span class="bchip-ico">🌟</span><span class="bchip-lbl">Icône emoji</span></div>
+      <div class="bchip" onclick="addBlock('iconrow',20,20)"><span class="bchip-ico">🎭</span><span class="bchip-lbl">Rangée</span></div>
+      <div class="bchip" onclick="addBlock('separateur',20,60)"><span class="bchip-ico">➖</span><span class="bchip-lbl">Séparateur</span></div>
+      <div class="bchip" onclick="addBlock('cadre',20,60)"><span class="bchip-ico">🔲</span><span class="bchip-lbl">Cadre</span></div>
+      <div class="bchip" onclick="addBlock('ruban',20,60)"><span class="bchip-ico">🎀</span><span class="bchip-lbl">Ruban</span></div>
+      <div class="bchip" onclick="addBlock('tampon',20,60)"><span class="bchip-ico">🔵</span><span class="bchip-lbl">Tampon</span></div>
+      <div class="bchip" onclick="addBlock('coin',20,20)"><span class="bchip-ico">🔱</span><span class="bchip-lbl">Coin déco</span></div>
+      <div class="bchip" onclick="addBlock('filigrane',20,60)"><span class="bchip-ico">💧</span><span class="bchip-lbl">Filigrane</span></div>
     </div>
     <div class="catlabel">🔲 QR & Tech</div>
     <div class="bgrid">
       <div class="bchip" onclick="openQRProfileModal()"><span class="bchip-ico">🪪</span><span class="bchip-lbl">QR Profil</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'barcode')" onclick="addBlock('barcode',20,60)"><span class="bchip-ico">▐▌▐▌</span><span class="bchip-lbl">Barcode</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'puce')" onclick="addBlock('puce',20,60)"><span class="bchip-ico">💳</span><span class="bchip-lbl">Puce NFC</span></div>
-      <div class="bchip" draggable="true" ondragstart="dstart(event,'matrice')" onclick="addBlock('matrice',20,60)"><span class="bchip-ico">🔳</span><span class="bchip-lbl">Matrice</span></div>
+      <div class="bchip" onclick="addBlock('barcode',20,60)"><span class="bchip-ico">▐▌▐▌</span><span class="bchip-lbl">Barcode</span></div>
+      <div class="bchip" onclick="addBlock('puce',20,60)"><span class="bchip-ico">💳</span><span class="bchip-lbl">Puce NFC</span></div>
+      <div class="bchip" onclick="addBlock('matrice',20,60)"><span class="bchip-ico">🔳</span><span class="bchip-lbl">Matrice</span></div>
     </div>
   </div>
 
@@ -481,12 +540,6 @@ select.pinp option{background:#1a1a2e;}
     <div class="setting-row">
       <label class="pchk"><input type="checkbox" id="shine-chk" checked onchange="toggleShine()"> Effet brillant</label>
     </div>
-    <!-- Mobile extra actions inside carte tab -->
-    <div class="setting-row" style="display:none" id="mob-extra-actions">
-      <span class="setting-label">Actions</span>
-      <button class="tbtn green" style="width:100%;justify-content:center;margin-bottom:6px" onclick="openSaveModal()">💾 Sauvegarder</button>
-      <button class="tbtn danger" style="width:100%;justify-content:center" onclick="clearAll()">🗑️ Vider la carte</button>
-    </div>
   </div>
 
   <div class="lscroll" id="lp-saves" style="display:none">
@@ -510,7 +563,7 @@ select.pinp option{background:#1a1a2e;}
   </div>
 </div>
 
-<!-- RIGHT PANEL (desktop/tablet) -->
+<!-- RIGHT PANEL -->
 <div class="rpanel" id="rpanel-main">
   <div class="rpanel-title">Propriétés du bloc</div>
   <div class="rscroll" id="props">
@@ -519,25 +572,44 @@ select.pinp option{background:#1a1a2e;}
 </div>
 </div>
 
-<!-- ═══ MOBILE BOTTOM BAR ═══ -->
+<!-- MOBILE BOTTOM BAR -->
 <div class="mob-toolbar" id="mob-toolbar">
   <div class="mob-tabs">
     <button class="mob-tab on" onclick="openMobPanel('blocs',this)"><span class="mob-ico">📦</span><span>Blocs</span></button>
     <button class="mob-tab" onclick="openMobPanel('tpl',this)"><span class="mob-ico">🎴</span><span>Templates</span></button>
     <button class="mob-tab" onclick="openMobPanel('carte',this)"><span class="mob-ico">🎨</span><span>Carte</span></button>
     <button class="mob-tab" onclick="openMobPanel('props',this)"><span class="mob-ico">⚙️</span><span>Propriétés</span></button>
-    <button class="mob-tab" onclick="openMobPanel('saves',this)"><span class="mob-ico">💾</span><span>Sauves</span></button>
+    <button class="mob-tab" onclick="openScanner()"><span class="mob-ico">📷</span><span>Scanner</span></button>
   </div>
 </div>
 
-<!-- ═══ MOBILE SLIDE-UP PANELS ═══ -->
 <div class="panel-backdrop" id="panel-backdrop" onclick="closeMobPanel()"></div>
-
 <div class="mob-panel" id="mob-panel">
   <div class="mob-panel-handle"></div>
   <div class="mob-panel-title" id="mob-panel-title">Blocs</div>
   <button class="mob-panel-close" onclick="closeMobPanel()">✕</button>
   <div class="mob-panel-scroll" id="mob-panel-content"></div>
+</div>
+
+<!-- ═══ SCANNER QR CODE ═══ -->
+<div class="scanner-overlay" id="scanner-overlay">
+  <div class="scanner-title">✦ SCANNER QR CODE ✦</div>
+  <div class="scanner-box" id="scanner-box">
+    <video class="scanner-video" id="scanner-video" autoplay playsinline muted></video>
+    <canvas id="scanner-canvas" style="display:none"></canvas>
+    <div class="scanner-frame">
+      <div class="scanner-corner sc-tl"></div>
+      <div class="scanner-corner sc-tr"></div>
+      <div class="scanner-corner sc-bl"></div>
+      <div class="scanner-corner sc-br"></div>
+      <div class="scanner-line" id="scanner-line"></div>
+    </div>
+  </div>
+  <div class="scanner-status" id="scanner-status">🔍 POINTEZ VERS UN QR CODE</div>
+  <div id="scanner-result-container"></div>
+  <div class="scanner-hint" id="scanner-hint">Scannez le QR code d'une Carte de Pote pour afficher le profil complet</div>
+  <select class="scanner-cam-select" id="scanner-cam-select" onchange="switchCamera(this.value)" style="display:none"></select>
+  <button class="scanner-close" onclick="closeScanner()">✕ FERMER</button>
 </div>
 
 <!-- ═══ MODAL QR PROFIL ═══ -->
@@ -590,7 +662,7 @@ select.pinp option{background:#1a1a2e;}
   </div>
 </div>
 
-<!-- ═══ FICHE SCANNÉE ═══ -->
+<!-- ═══ FICHE SCANNÉE (overlay séparé) ═══ -->
 <div class="fiche-overlay" id="fiche-overlay">
   <div class="fiche-card" id="fiche-card">
     <button class="fiche-close" onclick="closeFiche()">✕</button>
@@ -637,14 +709,259 @@ function deepCopy(o){return JSON.parse(JSON.stringify(o));}
 function isMobile(){return window.innerWidth<=640;}
 
 // ═══════════════════════════════════════
+// RESIZE CARD — carte TOUJOURS entièrement visible
+// ═══════════════════════════════════════
+let _resizeTimer=null;
+
+function resizeCard(){
+  const [w,h]=$('size-sel').value.split(',').map(Number);
+  CW=w; CH=h;
+
+  const wrap=$('canvas-wrap');
+
+  // Forcer le recalcul du layout
+  void wrap.offsetHeight;
+
+  const rect=wrap.getBoundingClientRect();
+  // Marge de sécurité de 24px de chaque côté
+  const availW=Math.max(rect.width-24, 60);
+  const availH=Math.max(rect.height-24, 40);
+
+  // On scale DOWN seulement — jamais d'agrandissement (max 1)
+  const scale=Math.min(availW/w, availH/h, 1);
+
+  const card=$('card');
+  card.style.width=w+'px';
+  card.style.height=h+'px';
+  card.style.transform='scale('+scale+')';
+  card.style.transformOrigin='center center';
+  card.style.borderRadius=Math.round(14*scale)+'px';
+
+  // card-scene : taille visuelle exacte de la carte
+  const sc=$('card-scene');
+  if(sc){
+    sc.style.width=Math.round(w*scale)+'px';
+    sc.style.height=Math.round(h*scale)+'px';
+  }
+
+  $('card-pat').width=w;
+  $('card-pat').height=h;
+  drawPat();
+}
+
+window.addEventListener('resize',()=>{clearTimeout(_resizeTimer);_resizeTimer=setTimeout(resizeCard,60);});
+window.addEventListener('orientationchange',()=>{setTimeout(resizeCard,300);});
+
+// ResizeObserver sur canvas-wrap — réagit à tout changement de taille
+if(typeof ResizeObserver!=='undefined'){
+  const ro=new ResizeObserver(()=>{
+    clearTimeout(_resizeTimer);
+    _resizeTimer=setTimeout(resizeCard,40);
+  });
+  // observe après que le DOM soit prêt
+  requestAnimationFrame(()=>{ const w=$('canvas-wrap'); if(w) ro.observe(w); });
+}
+
+// ═══════════════════════════════════════
+// SCANNER QR CODE — CAMÉRA RÉELLE + FICHE INLINE
+// ═══════════════════════════════════════
+let scannerStream=null;
+let scannerAnimId=null;
+let scannerActive=false;
+let scannerDebounce=false;
+
+async function openScanner(){
+  $('scanner-overlay').classList.add('show');
+  $('scanner-result-container').innerHTML='';
+  $('scanner-hint').style.display='';
+  setStatus('🔍 POINTEZ VERS UN QR CODE','');
+  scannerActive=true;
+  scannerDebounce=false;
+  await startCamera();
+}
+
+async function startCamera(deviceId){
+  try{
+    if(scannerStream){scannerStream.getTracks().forEach(t=>t.stop());scannerStream=null;}
+    const constraints={
+      video:deviceId
+        ?{deviceId:{exact:deviceId}}
+        :{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}
+    };
+    scannerStream=await navigator.mediaDevices.getUserMedia(constraints);
+    const video=$('scanner-video');
+    video.srcObject=scannerStream;
+    await video.play();
+    listCameras();
+    cancelAnimationFrame(scannerAnimId);
+    scanLoop();
+  }catch(err){
+    if(err.name==='NotAllowedError'){setStatus('⛔ ACCÈS CAMÉRA REFUSÉ','error');}
+    else if(err.name==='NotFoundError'){setStatus('❌ AUCUNE CAMÉRA TROUVÉE','error');}
+    else{setStatus('⚠️ ERREUR : '+err.message,'error');}
+  }
+}
+
+async function listCameras(){
+  try{
+    const devices=await navigator.mediaDevices.enumerateDevices();
+    const cams=devices.filter(d=>d.kind==='videoinput');
+    const sel=$('scanner-cam-select');
+    if(cams.length>1){
+      sel.style.display='';
+      sel.innerHTML=cams.map((c,i)=>`<option value="${c.deviceId}">${c.label||'Caméra '+(i+1)}</option>`).join('');
+      const back=cams.find(c=>
+        c.label.toLowerCase().includes('back')||
+        c.label.toLowerCase().includes('rear')||
+        c.label.toLowerCase().includes('environment')||
+        c.label.toLowerCase().includes('arrière')
+      );
+      if(back){sel.value=back.deviceId;}
+    }else{sel.style.display='none';}
+  }catch(e){}
+}
+
+function switchCamera(deviceId){if(deviceId)startCamera(deviceId);}
+
+function scanLoop(){
+  if(!scannerActive)return;
+  const video=$('scanner-video');
+  const canvas=$('scanner-canvas');
+  if(video.readyState===video.HAVE_ENOUGH_DATA){
+    const w=video.videoWidth, h=video.videoHeight;
+    if(w&&h){
+      canvas.width=w; canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(video,0,0,w,h);
+      const imageData=ctx.getImageData(0,0,w,h);
+      if(typeof jsQR!=='undefined'){
+        const code=jsQR(imageData.data,w,h,{inversionAttempts:'dontInvert'});
+        if(code&&!scannerDebounce){
+          handleQRFound(code.data);
+        }
+      }
+    }
+  }
+  scannerAnimId=requestAnimationFrame(scanLoop);
+}
+
+function handleQRFound(data){
+  scannerDebounce=true;
+  if(navigator.vibrate)navigator.vibrate([80,30,80]);
+
+  // Chercher un profil Carte de Pote (format: #profil=ID ou ?profil=ID)
+  const match=data.match(/[?#&]profil=([^&\s]+)/);
+  if(match){
+    const profileId=match[1];
+    const profiles=getProfiles();
+    const profile=profiles[profileId];
+    if(profile){
+      setStatus('✦ PROFIL TROUVÉ !','success');
+      // Arrêter le scan et afficher la fiche inline dans le scanner
+      setTimeout(()=>{
+        pauseScan();
+        showProfileInScanner(profile);
+      },600);
+    }else{
+      setStatus('⚠️ PROFIL NON TROUVÉ — ID INCONNU','error');
+      setTimeout(()=>{setStatus('🔍 POINTEZ VERS UN QR CODE','');scannerDebounce=false;},2500);
+    }
+  } else {
+    // QR code valide mais pas un profil Carte de Pote
+    setStatus('ℹ️ QR DÉTECTÉ — NON COMPATIBLE','error');
+    $('scanner-hint').innerHTML='<span style="color:rgba(255,255,255,.5);font-size:10px">'+data.slice(0,60)+(data.length>60?'…':'')+'</span>';
+    setTimeout(()=>{
+      setStatus('🔍 POINTEZ VERS UN QR CODE','');
+      $('scanner-hint').textContent='Scannez le QR code d\'une Carte de Pote pour afficher le profil complet';
+      scannerDebounce=false;
+    },3000);
+  }
+}
+
+function pauseScan(){
+  cancelAnimationFrame(scannerAnimId);
+  // Pause vidéo mais garde le stream actif
+  try{$('scanner-video').pause();}catch(e){}
+}
+
+function resumeScan(){
+  scannerDebounce=false;
+  $('scanner-result-container').innerHTML='';
+  $('scanner-hint').style.display='';
+  setStatus('🔍 POINTEZ VERS UN QR CODE','');
+  try{$('scanner-video').play();}catch(e){}
+  scanLoop();
+}
+
+// Affichage du profil DIRECTEMENT dans l'interface scanner
+function showProfileInScanner(p){
+  $('scanner-hint').style.display='none';
+  const photoHtml=p.photo
+    ?`<img src="${p.photo}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,168,76,.5);flex-shrink:0">`
+    :`<div style="width:52px;height:52px;border-radius:50%;border:2px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:24px;background:rgba(0,0,0,.3);flex-shrink:0">👤</div>`;
+
+  const statsHtml=(p.stats&&p.stats.length)?p.stats.map(s=>`
+    <div class="sri-stat">
+      <span class="sri-stat-name">${s.n}</span>
+      <div class="sri-stat-bar"><div class="sri-stat-fill" style="width:${s.v}%"></div></div>
+      <span class="sri-stat-val">${s.v}</span>
+    </div>`).join(''):'';
+
+  const fautesHtml=(p.fautes&&p.fautes.length)
+    ?p.fautes.map(f=>`<div class="sri-faute">📍 ${f.txt} <span style="color:var(--muted2);font-size:10px">(${f.date})</span></div>`).join('')
+    :`<div style="font-size:11px;color:var(--green)">✓ Aucune faute enregistrée</div>`;
+
+  const bioHtml=p.bio?`<div style="font-size:11px;color:var(--muted2);font-style:italic;margin-bottom:8px;line-height:1.5;">"${p.bio}"</div>`:'';
+
+  $('scanner-result-container').innerHTML=`
+    <div class="scanner-result-inline">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        ${photoHtml}
+        <div>
+          <div class="sri-name">${p.prenom} ${p.nom}</div>
+          <div class="sri-mat">MATRICULE : ${p.matricule}</div>
+        </div>
+      </div>
+      ${bioHtml}
+      ${statsHtml?`<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(201,168,76,.2);">📈 STATS</div><div class="sri-stats">${statsHtml}</div>`:''}
+      ${p.fautes&&p.fautes.length?`<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--gold);margin:8px 0 6px;padding-bottom:4px;border-bottom:1px solid rgba(201,168,76,.2);">⚠️ FAUTES (${p.fautes.length})</div>${fautesHtml}`:`<div style="margin-top:6px">${fautesHtml}</div>`}
+      <div class="sri-btn-row">
+        <button class="sri-btn" onclick="closeScanner();openFiche(getProfiles()['${p.id}'])">🔎 Fiche complète</button>
+        <button class="sri-btn" onclick="resumeScan()">📷 Re-scanner</button>
+        <button class="sri-btn danger" onclick="closeScanner()">✕ Fermer</button>
+      </div>
+    </div>`;
+}
+
+function setStatus(msg,type){
+  const el=$('scanner-status');
+  el.textContent=msg;
+  el.className='scanner-status'+(type?' '+type:'');
+}
+
+function closeScanner(){
+  scannerActive=false;
+  cancelAnimationFrame(scannerAnimId);
+  if(scannerStream){scannerStream.getTracks().forEach(t=>t.stop());scannerStream=null;}
+  const video=$('scanner-video');
+  if(video)video.srcObject=null;
+  $('scanner-overlay').classList.remove('show');
+  $('scanner-cam-select').style.display='none';
+  $('scanner-cam-select').innerHTML='';
+  $('scanner-result-container').innerHTML='';
+}
+
+$('scanner-overlay').addEventListener('click',e=>{
+  if(e.target===$('scanner-overlay'))closeScanner();
+});
+
+// ═══════════════════════════════════════
 // MOBILE PANEL SYSTEM
 // ═══════════════════════════════════════
 let mobPanelActive=null;
 
-// Contenu des panels mobiles (généré dynamiquement)
 function getMobBlocksHTML(){
-  return `
-  <div style="padding:12px">
+  return `<div style="padding:12px">
   <div class="catlabel">📝 Texte</div>
   <div class="bgrid">
     <div class="bchip" onclick="addBlock('titre',20,20);closeMobPanel()"><span class="bchip-ico">🔤</span><span class="bchip-lbl">Titre</span></div>
@@ -705,19 +1022,9 @@ function getMobTplHTML(){
   </div>`;
 }
 
-function getMobCarteHTML(){
-  // Clone the desktop carte panel content
-  const el=$('lp-carte');
-  const clone=el.cloneNode(true);
-  // Show mobile extra actions
-  const ea=clone.querySelector('#mob-extra-actions');
-  if(ea)ea.style.display='';
-  return `<div style="padding:12px">${clone.innerHTML}</div>`;
-}
-
 function getMobSavesHTML(){
   const saves=getSaves();const keys=Object.keys(saves).reverse();
-  const actionsHtml=`<div style="padding:12px">
+  return `<div style="padding:12px">
     <button class="tbtn green" style="width:100%;justify-content:center;margin-bottom:10px" onclick="openSaveModal()">💾 Nouvelle sauvegarde</button>
     ${!keys.length?'<div class="no-sel"><div class="no-sel-ico">💾</div><div class="no-sel-txt">Aucune sauvegarde.</div></div>':
     keys.map(k=>{const s=saves[k];return`<div class="save-item">
@@ -728,20 +1035,17 @@ function getMobSavesHTML(){
       </div>
     </div>`;}).join('')}
   </div>`;
-  return actionsHtml;
 }
 
 function getMobPropsHTML(){
   const b=BLK.find(x=>x.id===SEL);
   if(!b)return`<div style="padding:20px;text-align:center"><div style="font-size:32px;opacity:.3;margin-bottom:10px">⚙️</div><div style="font-size:12px;color:var(--muted2)">Sélectionne un bloc sur la carte pour modifier ses propriétés.</div></div>`;
-  // Get the props from the main props panel
   showProps(b);
   return `<div style="padding:12px">${$('props').innerHTML}</div>`;
 }
 
-function openMobPanel(type, btn){
+function openMobPanel(type,btn){
   if(!isMobile()){
-    // On non-mobile, fall back to desktop behavior
     if(type==='blocs'){switchLP('blocks',null);}
     else if(type==='tpl'){switchLP('tpl',null);}
     else if(type==='carte'){switchLP('carte',null);}
@@ -749,25 +1053,16 @@ function openMobPanel(type, btn){
     return;
   }
   mobPanelActive=type;
-  // Update tab highlights
   document.querySelectorAll('.mob-tab').forEach(t=>t.classList.remove('on'));
   if(btn)btn.classList.add('on');
-
   const titles={blocs:'Blocs',tpl:'Templates',carte:'Carte',saves:'Sauvegardes',props:'Propriétés'};
   $('mob-panel-title').textContent=titles[type]||'';
-
   let html='';
   if(type==='blocs')html=getMobBlocksHTML();
   else if(type==='tpl')html=getMobTplHTML();
-  else if(type==='carte')html=getMobCarteHTML();
   else if(type==='saves')html=getMobSavesHTML();
   else if(type==='props')html=getMobPropsHTML();
-
   $('mob-panel-content').innerHTML=html;
-
-  // Re-bind events in cloned carte panel
-  if(type==='carte'){rebindCarteEvents();}
-
   $('mob-panel').classList.add('show');
   $('panel-backdrop').classList.add('show');
 }
@@ -778,21 +1073,6 @@ function closeMobPanel(){
   mobPanelActive=null;
 }
 
-// Re-bind range/select events in mobile carte panel (since it's cloned)
-function rebindCarteEvents(){
-  const pc=$('mob-panel-content');
-  // bg-swatches
-  pc.querySelectorAll('.sw[onclick]').forEach(s=>{/* onclick already in HTML */});
-  // grad-op
-  const gradOpEl=pc.querySelector('#grad-op');
-  if(gradOpEl)gradOpEl.oninput=function(){setGradOp(this.value);};
-  const patOpEl=pc.querySelector('#pat-op');
-  if(patOpEl)patOpEl.oninput=function(){setPatOp(this.value);};
-  const bgImgOpEl=pc.querySelector('#bg-img-op');
-  if(bgImgOpEl)bgImgOpEl.oninput=function(){setBgImgOp(this.value);};
-}
-
-// When props change on mobile, update mob panel if open
 function maybeUpdateMobProps(){
   if(isMobile()&&mobPanelActive==='props'){
     const b=BLK.find(x=>x.id===SEL);
@@ -801,7 +1081,7 @@ function maybeUpdateMobProps(){
 }
 
 // ═══════════════════════════════════════
-// LP TABS (desktop)
+// LP TABS
 // ═══════════════════════════════════════
 function switchLP(id,btn){
   ['blocks','tpl','carte','saves'].forEach(x=>$('lp-'+x).style.display=x===id?'':'none');
@@ -811,31 +1091,11 @@ function switchLP(id,btn){
 }
 
 // ═══════════════════════════════════════
-// CARD RESIZE
-// ═══════════════════════════════════════
-function resizeCard(){
-  const [w,h]=$('size-sel').value.split(',').map(Number);
-  CW=w;CH=h;
-  const wrap=$('canvas-wrap');
-  const availW=wrap.clientWidth-24;
-  const availH=wrap.clientHeight-24;
-  const scale=Math.min(availW/w, availH/h, 1);
-  const c=$('card');
-  c.style.width=w+'px';c.style.height=h+'px';
-  c.style.transform=`scale(${scale})`;c.style.transformOrigin='center center';
-  const sc=$('card-scene');
-  if(sc){sc.style.width=(w*scale)+'px';sc.style.height=(h*scale)+'px';}
-  $('card-pat').width=w;$('card-pat').height=h;
-  drawPat();
-}
-window.addEventListener('resize',()=>{resizeCard();});
-
-// ═══════════════════════════════════════
 // BG
 // ═══════════════════════════════════════
 function setBgCol(col,el){
   bgColor=col;applyBg();
-  document.querySelectorAll('#bg-swatches .sw, #mob-panel-content .sw').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('#bg-swatches .sw').forEach(s=>s.classList.remove('on'));
   if(el)el.classList.add('on');
 }
 function applyBg(){
@@ -847,9 +1107,9 @@ function applyBg(){
     bg.style.opacity=bgImgOpacity/100;
     let tf='';if(bgFlipH)tf+='scaleX(-1) ';if(bgFlipV)tf+='scaleY(-1) ';
     bg.style.transform=tf.trim()||'none';
-  } else {bg.style.backgroundImage='none';bg.style.opacity='1';bg.style.transform='none';}
+  }else{bg.style.backgroundImage='none';bg.style.opacity='1';bg.style.transform='none';}
 }
-function setBgImgOp(v){bgImgOpacity=parseInt(v);const els=document.querySelectorAll('#bg-img-op-val');els.forEach(e=>e.textContent=v+'%');applyBg();}
+function setBgImgOp(v){bgImgOpacity=parseInt(v);document.querySelectorAll('#bg-img-op-val').forEach(e=>e.textContent=v+'%');applyBg();}
 function toggleBgFlip(d){
   if(d==='h'){bgFlipH=!bgFlipH;document.querySelectorAll('#flip-h-btn').forEach(b=>b.classList.toggle('on',bgFlipH));}
   else{bgFlipV=!bgFlipV;document.querySelectorAll('#flip-v-btn').forEach(b=>b.classList.toggle('on',bgFlipV));}
@@ -957,7 +1217,7 @@ const DEF={
 };
 
 // ═══════════════════════════════════════
-// DRAG (desktop)
+// DRAG
 // ═══════════════════════════════════════
 let dragType=null;
 function dstart(e,t){e.dataTransfer.setData('btype',t);dragType=t;}
@@ -981,8 +1241,7 @@ function handleImgBlock(inp){
   const r=new FileReader();r.onload=e=>{if(pendingImgCallback){pendingImgCallback(e.target.result);pendingImgCallback=null;}};r.readAsDataURL(f);inp.value='';
 }
 function triggerCellImg(blkId,rowIdx,cellIdx){
-  pendingCellCallback={blkId,rowIdx,cellIdx};
-  $('cell-img-input').click();
+  pendingCellCallback={blkId,rowIdx,cellIdx};$('cell-img-input').click();
 }
 function handleCellImg(inp){
   const f=inp.files[0];if(!f||!pendingCellCallback)return;
@@ -1035,6 +1294,7 @@ function renderQRFautesEdit(){
     </div>`).join('');
 }
 function addQRFaute(){qrFautes.push({txt:'',date:new Date().toISOString().split('T')[0]});renderQRFautesEdit();}
+
 function generateQRProfile(){
   const prenom=$('qr-prenom').value.trim()||'?';
   const nom=$('qr-nom').value.trim()||'?';
@@ -1049,18 +1309,23 @@ function generateQRProfile(){
   setTimeout(()=>buildQR(b),100);
   closeQRModal();toast('✦ QR Profil créé pour '+prenom+' '+nom+' !');
 }
+
 function getProfiles(){try{return JSON.parse(localStorage.getItem('cdp_profiles')||'{}');}catch(e){return{};}}
+
 function buildQR(b){
   const el=document.getElementById('qr-inner-'+b.id);if(!el)return;
   el.innerHTML='';
   try{new QRCode(el,{text:b.text||window.location.href,width:b.w-8,height:b.h-8,colorDark:'#ffffff',colorLight:'transparent',correctLevel:QRCode.CorrectLevel.M});}catch(e){}
 }
+
 function checkHashProfile(){
   const hash=window.location.hash;const m=hash.match(/#profil=(.+)/);
   if(m){const p=getProfiles()[m[1]];if(p)openFiche(p);}
 }
 window.addEventListener('hashchange',checkHashProfile);
+
 function openFiche(p){
+  if(!p)return;
   const fc=$('fiche-content');
   const photoHtml=p.photo?`<img src="${p.photo}" class="fiche-photo">`:`<div class="fiche-photo-placeholder">👤</div>`;
   const statsHtml=p.stats&&p.stats.length?`<div class="fiche-section"><div class="fiche-section-title">📈 Stats</div><div class="fiche-stats">${p.stats.map(s=>`<div class="fiche-stat-row"><span class="fiche-stat-name">${s.n}</span><div class="fiche-stat-bar"><div class="fiche-stat-fill" style="width:${s.v}%"></div></div><span class="fiche-stat-val">${s.v}</span></div>`).join('')}</div></div>`:'';
@@ -1100,14 +1365,14 @@ function getHTML(b){
     case 'regles':
       return`<div style="width:100%;height:100%;background:${b.bg};border:1px solid ${b.bord};border-radius:6px;padding:${b.pad}px;overflow:hidden"><div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:#e8c96a;margin-bottom:5px">${b.titre||'Règles'}</div>${(b.items||[]).map(it=>`<div style="font-family:'${b.font}',serif;font-size:${b.size}px;color:${b.color};margin-bottom:3px">${it}</div>`).join('')}</div>`;
     case 'tableau':{
-      const cellRender=(cell,blkId,ri,ci)=>{
+      const cellRender=(cell)=>{
         if(!cell)return'<span></span>';
         if(cell.type==='img'&&cell.val)return`<span style="display:inline-flex;align-items:center;justify-content:center"><img src="${cell.val}" style="max-height:28px;max-width:60px;object-fit:cover;border-radius:3px"></span>`;
         return`<span style="flex:1">${cell.val||''}</span>`;
       };
       return`<div style="width:100%;height:100%;background:${b.bg};border:1px solid ${b.bord};border-radius:6px;padding:${b.pad}px;overflow:hidden">${(b.rows||[]).map((row,ri)=>{
         const isHeader=row.header;
-        const cells=(row.cells||[]).map((cell,ci)=>cellRender(cell,b.id,ri,ci)).join('');
+        const cells=(row.cells||[]).map((cell)=>cellRender(cell)).join('');
         const chk=(!isHeader&&b.showCheck)?`<div style="width:13px;height:13px;border:1.5px solid rgba(201,168,76,.6);border-radius:2px;flex-shrink:0;background:${row.checked?'#c9a84c':'transparent'};display:flex;align-items:center;justify-content:center;font-size:8px;color:#000">${row.checked?'✓':''}</div>`:'';
         return`<div style="display:flex;align-items:center;gap:4px;border-bottom:${ri<b.rows.length-1?'1px solid rgba(255,255,255,.07)':'none'};padding-bottom:3px;margin-bottom:3px;font-family:'${b.font}',serif;font-size:${b.size}px;color:${isHeader?'#e8c96a':b.color};font-weight:${isHeader?700:400}">${cells}${chk}</div>`;
       }).join('')}</div>`;
@@ -1160,9 +1425,6 @@ function renderBlock(b){
   if(b.type==='qr')setTimeout(()=>buildQR(b),60);
 }
 
-// ═══════════════════════════════════════
-// DRAG (mouse)
-// ═══════════════════════════════════════
 function makeDraggable(el,b){
   el.addEventListener('mousedown',e=>{
     if(e.target.classList.contains('rh'))return;
@@ -1181,9 +1443,6 @@ function startResize(e,b){
   document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
 }
 
-// ═══════════════════════════════════════
-// TOUCH DRAG & RESIZE (mobile)
-// ═══════════════════════════════════════
 function makeTouchDraggable(el,b){
   let startX,startY,startBX,startBY,moved=false;
   el.addEventListener('touchstart',e=>{
@@ -1204,7 +1463,7 @@ function makeTouchDraggable(el,b){
     b.x=clamp(startBX+dx,0,CW-b.w);b.y=clamp(startBY+dy,0,CH-b.h);
     el.style.left=b.x+'px';el.style.top=b.y+'px';
   },{passive:false});
-  el.addEventListener('touchend',e=>{
+  el.addEventListener('touchend',()=>{
     if(!moved)return;
     if(SEL===b.id)showProps(b);
     maybeUpdateMobProps();
@@ -1221,16 +1480,12 @@ function startTouchResize(e,b){
   document.addEventListener('touchend',up);
 }
 
-// ═══════════════════════════════════════
-// SELECT / DESELECT
-// ═══════════════════════════════════════
 function selectBlock(id){
   SEL=id;document.querySelectorAll('.blk').forEach(e=>e.classList.remove('sel'));
   document.getElementById('blk-'+id)?.classList.add('sel');
   const b=BLK.find(x=>x.id===id);
   if(b){
     showProps(b);
-    // On mobile, open props panel automatically
     if(isMobile()){
       setTimeout(()=>openMobPanel('props',document.querySelector('.mob-tab:nth-child(4)')),50);
     }
@@ -1242,9 +1497,6 @@ function deselAll(e){
   $('props').innerHTML='<div class="no-sel"><div class="no-sel-ico">🖱️</div><div class="no-sel-txt">Clique sur un bloc pour le modifier.</div></div>';
 }
 
-// ═══════════════════════════════════════
-// PROPS PANEL
-// ═══════════════════════════════════════
 function sp(key,val,rr){
   const b=BLK.find(x=>x.id===SEL);if(!b)return;b[key]=val;
   if(rr)renderBlock(b);
@@ -1446,9 +1698,6 @@ function showProps(b){
   pc.innerHTML=h;
 }
 
-// ═══════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════
 function iconRowSet(v){const b=BLK.find(x=>x.id===SEL);if(!b)return;b.emojis=v.split(' ').filter(Boolean);renderBlock(b);}
 function clSet(i,k,v){const b=BLK.find(x=>x.id===SEL);if(!b)return;b.items[i][k]=v;renderBlock(b);}
 function clRm(i){const b=BLK.find(x=>x.id===SEL);if(!b)return;b.items.splice(i,1);renderBlock(b);showProps(b);maybeUpdateMobProps();}
@@ -1492,7 +1741,7 @@ function clearAll(){BLK=[];$('blocks').innerHTML='';SEL=null;deselAll({target:$(
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
   if((e.key==='Delete'||e.key==='Backspace')&&SEL)delSel();
-  if(e.key==='Escape')deselAll({target:$('card')});
+  if(e.key==='Escape'){deselAll({target:$('card')});closeScanner();}
   if(e.key==='d'&&(e.ctrlKey||e.metaKey)){e.preventDefault();dupBlock();}
   if(SEL){
     const b=BLK.find(x=>x.id===SEL);if(!b)return;const s=e.shiftKey?10:1;const el=document.getElementById('blk-'+b.id);
@@ -1503,7 +1752,6 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// Prevent canvas-wrap from scrolling on touch while dragging blocks
 $('canvas-wrap').addEventListener('touchmove',e=>{
   if(e.target.closest('.blk'))e.preventDefault();
 },{passive:false});
@@ -1649,10 +1897,16 @@ function exportPNG(){
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
-resizeCard();
 renderGradStops();
 loadTpl('classic');
 checkHashProfile();
+
+// Double rAF : attend que le navigateur peigne le layout
+requestAnimationFrame(()=>{
+  requestAnimationFrame(()=>{
+    resizeCard();
+  });
+});
 </script>
 </body>
 </html>
