@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=UnifrakturMaguntia&family=IM+Fell+English:ital@0;1&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Bebas+Neue&family=Press+Start+2P&family=Spectral:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- jsQR chargé en priorité -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <style>
 :root{
@@ -25,7 +26,6 @@
 html,body{height:100%;font-family:'Crimson Pro',Georgia,serif;touch-action:manipulation;}
 body{background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100dvh;overflow:hidden;}
 
-/* ─── TOPBAR ─── */
 .topbar{height:var(--topbar-h);background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;padding:0 10px;flex-shrink:0;z-index:200;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .topbar::-webkit-scrollbar{display:none;}
 .logo{font-family:'Cinzel',serif;font-size:13px;font-weight:900;letter-spacing:4px;color:var(--gold2);white-space:nowrap;margin-right:6px;flex-shrink:0;}
@@ -43,11 +43,8 @@ body{background:var(--bg);color:var(--text);display:flex;flex-direction:column;h
 select.tbtn{cursor:pointer;}
 select.tbtn option{background:#1a1a2e;}
 
-/* ─── LAYOUT DESKTOP ─── */
-/* canvas-wrap prend TOUT l'espace restant en hauteur */
 .layout{display:grid;grid-template-columns:var(--lp-w) 1fr var(--rp-w);flex:1;min-height:0;overflow:hidden;}
 
-/* ─── LEFT PANEL ─── */
 .lpanel{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;}
 .lptabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
 .lptab{flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted2);font-family:'Crimson Pro',serif;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:9px 2px;cursor:pointer;transition:all .15s;}
@@ -102,8 +99,6 @@ input[type=range]{accent-color:var(--gold);width:100%;}
 .grad-stop-pos{font-size:10px;color:var(--muted2);min-width:28px;text-align:right;}
 .grad-preview{height:20px;border-radius:4px;margin-bottom:6px;border:1px solid var(--border);}
 
-/* ─── CANVAS ─── */
-/* La carte doit toujours être entièrement visible */
 .canvas-wrap{
   background:var(--bg);
   display:flex;
@@ -132,7 +127,6 @@ input[type=range]{accent-color:var(--gold);width:100%;}
 .rh{position:absolute;bottom:-6px;right:-6px;width:14px;height:14px;background:var(--gold2);border-radius:3px;cursor:se-resize;z-index:20;display:none;touch-action:none;}
 .blk.sel .rh{display:block;}
 
-/* ─── RIGHT PANEL ─── */
 .rpanel{background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;min-height:0;}
 .rpanel-title{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding:12px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .rscroll{flex:1;overflow-y:auto;padding:12px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;-webkit-overflow-scrolling:touch;}
@@ -183,7 +177,6 @@ select.pinp option{background:#1a1a2e;}
 .flip-btn{flex:1;background:var(--panel2);border:1px solid var(--border);border-radius:5px;color:var(--muted2);font-size:11px;padding:6px 4px;cursor:pointer;transition:all .15s;text-align:center;}
 .flip-btn:hover,.flip-btn.on,.flip-btn:active{background:rgba(201,168,76,.15);border-color:var(--gold);color:var(--gold2);}
 
-/* ─── MODAL ─── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto;}
 .modal-overlay.show{display:flex;}
 .modal{background:var(--panel);border:1px solid var(--border2);border-radius:14px;padding:24px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.7);}
@@ -213,7 +206,162 @@ select.pinp option{background:#1a1a2e;}
 .stat-edit-item input[type=range]{flex:2;min-width:60px;}
 .stat-edit-val{font-size:12px;color:var(--gold2);min-width:20px;text-align:right;}
 
-/* ─── FICHE SCANNÉE ─── */
+/* ══════════════════════
+   SCANNER QR — REFAIT
+   ══════════════════════ */
+.scanner-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.97);
+  z-index:3000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:12px;
+  padding:16px;
+}
+.scanner-overlay.show{display:flex;}
+
+.scanner-title{
+  font-family:'Cinzel',serif;
+  font-size:11px;letter-spacing:4px;
+  color:var(--gold2);text-align:center;
+}
+
+.scanner-box{
+  position:relative;
+  width:min(300px,75vw);
+  height:min(300px,75vw);
+  flex-shrink:0;
+}
+
+.scanner-video{
+  width:100%;height:100%;
+  object-fit:cover;
+  border-radius:16px;
+  display:block;
+  background:#000;
+}
+
+/* Coins décoratifs */
+.scanner-frame{position:absolute;inset:0;border-radius:16px;pointer-events:none;}
+.scanner-corner{position:absolute;width:28px;height:28px;border-color:var(--gold2);border-style:solid;}
+.sc-tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:8px 0 0 0;}
+.sc-tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 8px 0 0;}
+.sc-bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 8px;}
+.sc-br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 8px 0;}
+
+/* Ligne de scan animée */
+.scanner-line{
+  position:absolute;
+  left:8%;width:84%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold2),transparent);
+  animation:scanline 2s ease-in-out infinite;
+  top:10%;border-radius:2px;
+  display:none; /* cachée par défaut, affichée quand cam active */
+}
+.scanner-line.active{display:block;}
+@keyframes scanline{
+  0%,100%{top:10%;opacity:.6;}
+  50%{top:84%;opacity:1;}
+}
+
+/* Zones de boutons */
+.scanner-actions{
+  display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;max-width:340px;
+}
+
+.scanner-status{
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;
+  color:var(--gold2);text-align:center;
+  padding:9px 22px;
+  background:rgba(201,168,76,.08);
+  border:1px solid rgba(201,168,76,.25);
+  border-radius:10px;
+  max-width:340px;width:100%;
+  word-break:break-word;
+  transition:all .3s;
+}
+.scanner-status.success{color:var(--green);border-color:rgba(76,175,130,.5);background:rgba(76,175,130,.1);}
+.scanner-status.error{color:var(--red);border-color:rgba(224,82,82,.5);background:rgba(224,82,82,.08);}
+.scanner-status.info{color:#7aabff;border-color:rgba(58,107,196,.4);background:rgba(58,107,196,.1);}
+
+.scanner-hint{
+  font-size:11px;color:var(--muted2);text-align:center;
+  max-width:300px;line-height:1.6;
+  font-family:'Crimson Pro',serif;
+}
+
+.scanner-cam-select{
+  background:var(--panel2);border:1px solid var(--border);
+  border-radius:6px;color:var(--text);
+  font-family:'Crimson Pro',serif;font-size:12px;
+  padding:5px 8px;cursor:pointer;
+  max-width:280px;width:100%;outline:none;
+  display:none;
+}
+.scanner-cam-select option{background:#1a1a2e;}
+
+/* Boutons du scanner */
+.scanner-btn-row{display:flex;gap:8px;width:100%;max-width:340px;}
+.scanner-btn{
+  flex:1;background:rgba(201,168,76,.1);
+  border:1px solid rgba(201,168,76,.35);
+  border-radius:8px;color:var(--gold2);
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;
+  padding:9px 8px;cursor:pointer;transition:all .15s;text-align:center;
+}
+.scanner-btn:hover,.scanner-btn:active{background:rgba(201,168,76,.25);}
+.scanner-btn.danger{background:rgba(224,82,82,.1);border-color:rgba(224,82,82,.3);color:var(--red);}
+.scanner-btn.primary{background:rgba(58,107,196,.2);border-color:rgba(58,107,196,.5);color:#7aabff;}
+
+/* Résultat inline */
+.scanner-result{
+  background:linear-gradient(135deg,#0d1f3c,#1a2a50);
+  border:1px solid rgba(201,168,76,.4);
+  border-radius:14px;
+  padding:16px 18px;
+  width:100%;max-width:340px;
+  max-height:45vh;
+  overflow-y:auto;
+  box-shadow:0 0 40px rgba(201,168,76,.15);
+  display:none;
+}
+.scanner-result.show{display:block;}
+
+.sri-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.sri-photo{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,168,76,.5);flex-shrink:0;}
+.sri-photo-ph{width:52px;height:52px;border-radius:50%;border:2px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:22px;background:rgba(0,0,0,.3);flex-shrink:0;}
+.sri-name{font-family:'Cinzel',serif;font-size:16px;color:var(--gold2);font-weight:700;}
+.sri-mat{font-size:11px;color:var(--muted2);letter-spacing:2px;}
+.sri-bio{font-size:11px;color:var(--muted2);font-style:italic;margin:8px 0;line-height:1.5;}
+.sri-section{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--gold);margin:8px 0 5px;padding-bottom:3px;border-bottom:1px solid rgba(201,168,76,.2);}
+.sri-stat{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.sri-stat-name{font-size:11px;color:var(--muted2);min-width:80px;}
+.sri-stat-bar{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;}
+.sri-stat-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));}
+.sri-stat-val{font-size:10px;color:var(--gold2);min-width:22px;text-align:right;}
+.sri-faute{font-size:11px;color:rgba(224,82,82,.9);padding:4px 8px;background:rgba(224,82,82,.08);border-radius:4px;margin-bottom:3px;}
+
+/* Séparateur de fiche */
+.scanner-sep{width:100%;max-width:340px;height:1px;background:rgba(255,255,255,.06);}
+
+/* Bouton image fallback */
+.scanner-img-label{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  background:rgba(255,255,255,.04);
+  border:1px dashed rgba(255,255,255,.15);
+  border-radius:8px;
+  color:var(--muted2);
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;
+  padding:8px 16px;cursor:pointer;
+  transition:all .15s;
+  max-width:340px;width:100%;
+  text-align:center;
+}
+.scanner-img-label:hover{border-color:rgba(201,168,76,.4);color:var(--gold2);}
+
+/* ══════════════════ */
 .fiche-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:none;align-items:center;justify-content:center;overflow-y:auto;padding:16px;}
 .fiche-overlay.show{display:flex;}
 .fiche-card{background:linear-gradient(135deg,#0d1f3c,#1a2a50);border:1px solid rgba(201,168,76,.3);border-radius:18px;padding:28px;width:100%;max-width:420px;box-shadow:0 0 60px rgba(201,168,76,.15),0 30px 80px rgba(0,0,0,.8);position:relative;}
@@ -238,72 +386,12 @@ select.pinp option{background:#1a1a2e;}
 .fiche-faute-date{font-size:10px;color:var(--muted2);}
 .fiche-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.1));border:1px solid rgba(201,168,76,.4);border-radius:20px;padding:4px 12px;font-family:'Cinzel',serif;font-size:10px;color:var(--gold2);letter-spacing:2px;margin-bottom:14px;}
 
-/* ─── SCANNER QR ─── */
-.scanner-overlay{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:3000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:16px;}
-.scanner-overlay.show{display:flex;}
-.scanner-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;color:var(--gold2);text-align:center;}
-.scanner-box{position:relative;width:min(300px,75vw);height:min(300px,75vw);flex-shrink:0;}
-.scanner-video{width:100%;height:100%;object-fit:cover;border-radius:16px;display:block;background:#000;}
-.scanner-frame{position:absolute;inset:0;border-radius:16px;pointer-events:none;}
-.scanner-corner{position:absolute;width:28px;height:28px;border-color:var(--gold2);border-style:solid;}
-.sc-tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:8px 0 0 0;}
-.sc-tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 8px 0 0;}
-.sc-bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 8px;}
-.sc-br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 8px 0;}
-.scanner-line{position:absolute;left:8%;width:84%;height:2px;background:linear-gradient(90deg,transparent,var(--gold2),transparent);animation:scanline 2s ease-in-out infinite;top:10%;border-radius:2px;}
-@keyframes scanline{0%,100%{top:10%;opacity:.6;}50%{top:84%;opacity:1;}}
-.scanner-status{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold2);text-align:center;padding:9px 22px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:10px;max-width:300px;word-break:break-word;}
-.scanner-status.success{color:var(--green);border-color:rgba(76,175,130,.5);background:rgba(76,175,130,.1);animation:pulse-ok .5s ease;}
-.scanner-status.error{color:var(--red);border-color:rgba(224,82,82,.5);background:rgba(224,82,82,.08);}
-@keyframes pulse-ok{0%{transform:scale(.97);}50%{transform:scale(1.03);}100%{transform:scale(1);}}
-.scanner-hint{font-size:11px;color:var(--muted2);text-align:center;max-width:280px;line-height:1.6;font-family:'Crimson Pro',serif;}
-.scanner-cam-select{background:var(--panel2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Crimson Pro',serif;font-size:12px;padding:5px 8px;cursor:pointer;max-width:260px;outline:none;}
-.scanner-cam-select option{background:#1a1a2e;}
-.scanner-close{background:none;border:1px solid rgba(255,255,255,.12);border-radius:8px;color:var(--muted2);font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;padding:9px 24px;cursor:pointer;transition:all .15s;}
-.scanner-close:hover,.scanner-close:active{border-color:var(--gold);color:var(--gold2);}
-
-/* Résultat inline dans scanner */
-.scanner-result-inline{
-  background:linear-gradient(135deg,#0d1f3c,#1a2a50);
-  border:1px solid rgba(201,168,76,.4);
-  border-radius:14px;
-  padding:16px 20px;
-  width:min(340px,88vw);
-  max-height:50vh;
-  overflow-y:auto;
-  box-shadow:0 0 40px rgba(201,168,76,.2);
-}
-.sri-name{font-family:'Cinzel',serif;font-size:16px;color:var(--gold2);font-weight:700;margin-bottom:4px;}
-.sri-mat{font-size:11px;color:var(--muted2);letter-spacing:2px;margin-bottom:10px;}
-.sri-bio{font-size:12px;color:var(--muted2);font-style:italic;margin-bottom:10px;line-height:1.5;}
-.sri-stats{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
-.sri-stat{display:flex;align-items:center;gap:6px;}
-.sri-stat-name{font-size:11px;color:var(--muted2);min-width:80px;}
-.sri-stat-bar{flex:1;height:5px;background:rgba(255,255,255,.07);border-radius:3px;}
-.sri-stat-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold2));}
-.sri-stat-val{font-size:10px;color:var(--gold2);min-width:22px;text-align:right;}
-.sri-faute{font-size:11px;color:rgba(224,82,82,.9);padding:4px 8px;background:rgba(224,82,82,.08);border-radius:4px;margin-bottom:3px;}
-.sri-btn-row{display:flex;gap:8px;margin-top:10px;}
-.sri-btn{flex:1;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:7px;color:var(--gold2);font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;padding:8px;cursor:pointer;transition:all .15s;}
-.sri-btn:hover,.sri-btn:active{background:rgba(201,168,76,.3);}
-.sri-btn.danger{background:rgba(224,82,82,.1);border-color:rgba(224,82,82,.3);color:var(--red);}
-
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--gold);color:#1a1000;padding:9px 20px;border-radius:7px;font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:2px;opacity:0;pointer-events:none;transition:all .28s;z-index:9999;white-space:nowrap;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-.cell-img-wrap{display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
-.cell-img-wrap img{max-width:100%;max-height:36px;border-radius:3px;object-fit:cover;}
-.cell-img-btn{background:var(--panel2);border:1px dashed var(--border2);border-radius:4px;color:var(--muted2);font-size:9px;padding:3px 6px;cursor:pointer;transition:all .12s;white-space:nowrap;}
-.cell-img-btn:hover,.cell-img-btn:active{border-color:var(--gold);color:var(--gold2);}
-
-/* ─── MOBILE BOTTOM TOOLBAR ─── */
 .mob-toolbar{display:none;background:var(--panel);border-top:1px solid var(--border);flex-shrink:0;z-index:150;}
 .mob-tabs{display:flex;height:50px;}
 .mob-tab{flex:1;background:none;border:none;border-top:2px solid transparent;color:var(--muted2);font-family:'Crimson Pro',serif;font-size:10px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;padding:4px 2px;transition:all .15s;}
 .mob-tab .mob-ico{font-size:18px;}
 .mob-tab.on{color:var(--gold2);border-top-color:var(--gold);}
 
-/* ─── MOBILE SLIDE-UP PANEL ─── */
 .mob-panel{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--panel);border-top:1px solid var(--border2);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.6);transform:translateY(100%);transition:transform .3s ease;max-height:70vh;flex-direction:column;}
 .mob-panel.show{transform:translateY(0);}
 .mob-panel-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:10px auto 6px;}
@@ -314,9 +402,14 @@ select.pinp option{background:#1a1a2e;}
 .panel-backdrop{display:none;position:fixed;inset:0;z-index:290;background:rgba(0,0,0,.5);}
 .panel-backdrop.show{display:block;}
 
-/* ══════════════════════════════════════
-   RESPONSIVE
-   ══════════════════════════════════════ */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--gold);color:#1a1000;padding:9px 20px;border-radius:7px;font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:2px;opacity:0;pointer-events:none;transition:all .28s;z-index:9999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+.cell-img-wrap{display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
+.cell-img-wrap img{max-width:100%;max-height:36px;border-radius:3px;object-fit:cover;}
+.cell-img-btn{background:var(--panel2);border:1px dashed var(--border2);border-radius:4px;color:var(--muted2);font-size:9px;padding:3px 6px;cursor:pointer;transition:all .12s;white-space:nowrap;}
+.cell-img-btn:hover,.cell-img-btn:active{border-color:var(--gold);color:var(--gold2);}
+
 @media (min-width: 1400px){
   :root{--lp-w:290px;--rp-w:320px;--topbar-h:54px;}
 }
@@ -340,23 +433,21 @@ select.pinp option{background:#1a1a2e;}
   .tbtn-hide-mob{display:none;}
   .sep-mob{display:none;}
   .toast{bottom:80px;}
-  .scanner-box{width:min(280px,78vw);height:min(280px,78vw);}
+  .scanner-box{width:min(260px,72vw);height:min(260px,72vw);}
 }
 @media (max-width: 420px){
-  .scanner-box{width:min(250px,74vw);height:min(250px,74vw);}
-  .scanner-status{font-size:10px;padding:7px 14px;}
+  .scanner-box{width:min(220px,68vw);height:min(220px,68vw);}
 }
 @media (max-height:500px) and (orientation:landscape){
-  .scanner-overlay{gap:8px;}
-  .scanner-box{width:min(180px,38vw);height:min(180px,38vw);}
+  .scanner-overlay{gap:6px;}
+  .scanner-box{width:min(160px,35vw);height:min(160px,35vw);}
   .scanner-hint{display:none;}
-  .scanner-result-inline{max-height:40vh;}
+  .scanner-result{max-height:35vh;}
 }
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="logo">✦ CARTE DE POTE</div>
   <div class="sep"></div>
@@ -384,7 +475,6 @@ select.pinp option{background:#1a1a2e;}
 
 <div class="layout">
 
-<!-- LEFT PANEL -->
 <div class="lpanel" id="lpanel-main">
   <div class="lptabs">
     <button class="lptab on" onclick="switchLP('blocks',this)">Blocs</button>
@@ -547,7 +637,6 @@ select.pinp option{background:#1a1a2e;}
   </div>
 </div>
 
-<!-- CANVAS -->
 <div class="canvas-wrap" id="canvas-wrap" ondragover="event.preventDefault()" ondrop="handleDrop(event)">
   <div class="card-scene" id="card-scene">
     <div id="card" style="width:640px;height:404px" onclick="deselAll(event)">
@@ -563,7 +652,6 @@ select.pinp option{background:#1a1a2e;}
   </div>
 </div>
 
-<!-- RIGHT PANEL -->
 <div class="rpanel" id="rpanel-main">
   <div class="rpanel-title">Propriétés du bloc</div>
   <div class="rscroll" id="props">
@@ -572,7 +660,6 @@ select.pinp option{background:#1a1a2e;}
 </div>
 </div>
 
-<!-- MOBILE BOTTOM BAR -->
 <div class="mob-toolbar" id="mob-toolbar">
   <div class="mob-tabs">
     <button class="mob-tab on" onclick="openMobPanel('blocs',this)"><span class="mob-ico">📦</span><span>Blocs</span></button>
@@ -591,12 +678,16 @@ select.pinp option{background:#1a1a2e;}
   <div class="mob-panel-scroll" id="mob-panel-content"></div>
 </div>
 
-<!-- ═══ SCANNER QR CODE ═══ -->
+<!-- ═══════════════════════════════
+     SCANNER QR — INTERFACE REFAITE
+     ═══════════════════════════════ -->
 <div class="scanner-overlay" id="scanner-overlay">
   <div class="scanner-title">✦ SCANNER QR CODE ✦</div>
+
+  <!-- Vidéo + cadre -->
   <div class="scanner-box" id="scanner-box">
     <video class="scanner-video" id="scanner-video" autoplay playsinline muted></video>
-    <canvas id="scanner-canvas" style="display:none"></canvas>
+    <canvas id="scanner-canvas" style="display:none" width="1" height="1"></canvas>
     <div class="scanner-frame">
       <div class="scanner-corner sc-tl"></div>
       <div class="scanner-corner sc-tr"></div>
@@ -605,11 +696,33 @@ select.pinp option{background:#1a1a2e;}
       <div class="scanner-line" id="scanner-line"></div>
     </div>
   </div>
-  <div class="scanner-status" id="scanner-status">🔍 POINTEZ VERS UN QR CODE</div>
-  <div id="scanner-result-container"></div>
-  <div class="scanner-hint" id="scanner-hint">Scannez le QR code d'une Carte de Pote pour afficher le profil complet</div>
-  <select class="scanner-cam-select" id="scanner-cam-select" onchange="switchCamera(this.value)" style="display:none"></select>
-  <button class="scanner-close" onclick="closeScanner()">✕ FERMER</button>
+
+  <!-- Status -->
+  <div class="scanner-status" id="scanner-status">⏳ INITIALISATION...</div>
+
+  <!-- Résultat profil trouvé -->
+  <div class="scanner-result" id="scanner-result"></div>
+
+  <!-- Actions -->
+  <div class="scanner-actions">
+    <select class="scanner-cam-select" id="scanner-cam-select" onchange="switchCamera(this.value)"></select>
+
+    <div class="scanner-btn-row" id="scanner-btn-row-scan">
+      <button class="scanner-btn primary" onclick="scanFromImage()" title="Scanner depuis une image">🖼 Image</button>
+      <button class="scanner-btn danger" onclick="closeScanner()">✕ Fermer</button>
+    </div>
+
+    <div class="scanner-btn-row" id="scanner-btn-row-result" style="display:none">
+      <button class="scanner-btn" onclick="openFicheFromResult()">🔎 Fiche complète</button>
+      <button class="scanner-btn primary" onclick="resumeScan()">📷 Re-scanner</button>
+      <button class="scanner-btn danger" onclick="closeScanner()">✕ Fermer</button>
+    </div>
+
+    <div class="scanner-hint" id="scanner-hint">Pointez la caméra vers un QR code de Carte de Pote</div>
+  </div>
+
+  <!-- Input caché pour scan image -->
+  <input type="file" id="scanner-img-input" accept="image/*" style="display:none" onchange="handleScanImage(this)">
 </div>
 
 <!-- ═══ MODAL QR PROFIL ═══ -->
@@ -650,7 +763,6 @@ select.pinp option{background:#1a1a2e;}
   </div>
 </div>
 
-<!-- ═══ MODAL SAVE ═══ -->
 <div class="modal-overlay" id="save-modal">
   <div class="modal" style="max-width:340px">
     <h3>💾 SAUVEGARDER</h3>
@@ -662,7 +774,6 @@ select.pinp option{background:#1a1a2e;}
   </div>
 </div>
 
-<!-- ═══ FICHE SCANNÉE (overlay séparé) ═══ -->
 <div class="fiche-overlay" id="fiche-overlay">
   <div class="fiche-card" id="fiche-card">
     <button class="fiche-close" onclick="closeFiche()">✕</button>
@@ -692,6 +803,9 @@ let qrPhotoData=null;
 let qrStats=[{n:'Force',v:75},{n:'Loyauté',v:90},{n:'Humour',v:80}];
 let qrFautes=[{txt:'Oubli de pizza',date:'2024-01-15'},{txt:'Trahison mineure',date:'2024-03-22'}];
 
+// Dernier profil scanné (pour bouton "Fiche complète")
+let lastScannedProfile=null;
+
 const EMOJIS=('🗝️🤝☘️⚔️🔥💀👑💎🛡️⚡🐺⚓❤️💪🎯🎭🍺🎮🎵🏆🌙☀️⭐🌊🦁🐉🔮🗡️🔱🏴🪬🧿☯️♾️🔺✝️🎀💫🌟✨🔴🟡🟢🔵🟣⚫⚪🦊🐻🦅🔑⚜️🏅🎖️👁️✊🙏').match(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu)||[];
 const FONTS=[
   {l:'Cinzel',v:'Cinzel'},{l:'Crimson Pro',v:'Crimson Pro'},{l:'Bebas Neue',v:'Bebas Neue'},
@@ -709,251 +823,385 @@ function deepCopy(o){return JSON.parse(JSON.stringify(o));}
 function isMobile(){return window.innerWidth<=640;}
 
 // ═══════════════════════════════════════
-// RESIZE CARD — carte TOUJOURS entièrement visible
+// RESIZE
 // ═══════════════════════════════════════
 let _resizeTimer=null;
-
 function resizeCard(){
   const [w,h]=$('size-sel').value.split(',').map(Number);
   CW=w; CH=h;
-
   const wrap=$('canvas-wrap');
-
-  // Forcer le recalcul du layout
   void wrap.offsetHeight;
-
   const rect=wrap.getBoundingClientRect();
-  // Marge de sécurité de 24px de chaque côté
   const availW=Math.max(rect.width-24, 60);
   const availH=Math.max(rect.height-24, 40);
-
-  // On scale DOWN seulement — jamais d'agrandissement (max 1)
   const scale=Math.min(availW/w, availH/h, 1);
-
   const card=$('card');
   card.style.width=w+'px';
   card.style.height=h+'px';
   card.style.transform='scale('+scale+')';
   card.style.transformOrigin='center center';
   card.style.borderRadius=Math.round(14*scale)+'px';
-
-  // card-scene : taille visuelle exacte de la carte
   const sc=$('card-scene');
-  if(sc){
-    sc.style.width=Math.round(w*scale)+'px';
-    sc.style.height=Math.round(h*scale)+'px';
-  }
-
+  if(sc){sc.style.width=Math.round(w*scale)+'px';sc.style.height=Math.round(h*scale)+'px';}
   $('card-pat').width=w;
   $('card-pat').height=h;
   drawPat();
 }
-
 window.addEventListener('resize',()=>{clearTimeout(_resizeTimer);_resizeTimer=setTimeout(resizeCard,60);});
 window.addEventListener('orientationchange',()=>{setTimeout(resizeCard,300);});
-
-// ResizeObserver sur canvas-wrap — réagit à tout changement de taille
 if(typeof ResizeObserver!=='undefined'){
-  const ro=new ResizeObserver(()=>{
-    clearTimeout(_resizeTimer);
-    _resizeTimer=setTimeout(resizeCard,40);
-  });
-  // observe après que le DOM soit prêt
-  requestAnimationFrame(()=>{ const w=$('canvas-wrap'); if(w) ro.observe(w); });
+  const ro=new ResizeObserver(()=>{clearTimeout(_resizeTimer);_resizeTimer=setTimeout(resizeCard,40);});
+  requestAnimationFrame(()=>{const w=$('canvas-wrap');if(w)ro.observe(w);});
 }
 
 // ═══════════════════════════════════════
-// SCANNER QR CODE — CAMÉRA RÉELLE + FICHE INLINE
+// SCANNER QR — COMPLÈTEMENT REFAIT
 // ═══════════════════════════════════════
-let scannerStream=null;
-let scannerAnimId=null;
-let scannerActive=false;
-let scannerDebounce=false;
+let scannerStream = null;
+let scannerRafId = null;
+let scannerActive = false;
+let scannerPaused = false;
+let scannerDebounceTs = 0;
+const SCAN_DEBOUNCE_MS = 2000;
+
+// Vérifie que jsQR est bien chargé
+function isJsQRReady(){
+  return typeof jsQR === 'function';
+}
 
 async function openScanner(){
+  // Reset UI
+  resetScannerUI();
   $('scanner-overlay').classList.add('show');
-  $('scanner-result-container').innerHTML='';
-  $('scanner-hint').style.display='';
-  setStatus('🔍 POINTEZ VERS UN QR CODE','');
-  scannerActive=true;
-  scannerDebounce=false;
-  await startCamera();
-}
+  scannerActive = true;
+  scannerPaused = false;
+  lastScannedProfile = null;
 
-async function startCamera(deviceId){
-  try{
-    if(scannerStream){scannerStream.getTracks().forEach(t=>t.stop());scannerStream=null;}
-    const constraints={
-      video:deviceId
-        ?{deviceId:{exact:deviceId}}
-        :{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}}
-    };
-    scannerStream=await navigator.mediaDevices.getUserMedia(constraints);
-    const video=$('scanner-video');
-    video.srcObject=scannerStream;
-    await video.play();
-    listCameras();
-    cancelAnimationFrame(scannerAnimId);
-    scanLoop();
-  }catch(err){
-    if(err.name==='NotAllowedError'){setStatus('⛔ ACCÈS CAMÉRA REFUSÉ','error');}
-    else if(err.name==='NotFoundError'){setStatus('❌ AUCUNE CAMÉRA TROUVÉE','error');}
-    else{setStatus('⚠️ ERREUR : '+err.message,'error');}
+  if(!isJsQRReady()){
+    setStatus('⚠️ Bibliothèque jsQR non chargée', 'error');
+    $('scanner-hint').textContent = 'Rechargez la page et réessayez.';
+    return;
   }
+
+  await initCamera();
 }
 
-async function listCameras(){
-  try{
-    const devices=await navigator.mediaDevices.enumerateDevices();
-    const cams=devices.filter(d=>d.kind==='videoinput');
-    const sel=$('scanner-cam-select');
-    if(cams.length>1){
-      sel.style.display='';
-      sel.innerHTML=cams.map((c,i)=>`<option value="${c.deviceId}">${c.label||'Caméra '+(i+1)}</option>`).join('');
-      const back=cams.find(c=>
-        c.label.toLowerCase().includes('back')||
-        c.label.toLowerCase().includes('rear')||
-        c.label.toLowerCase().includes('environment')||
-        c.label.toLowerCase().includes('arrière')
-      );
-      if(back){sel.value=back.deviceId;}
-    }else{sel.style.display='none';}
-  }catch(e){}
+function resetScannerUI(){
+  $('scanner-result').classList.remove('show');
+  $('scanner-result').innerHTML = '';
+  $('scanner-btn-row-scan').style.display = '';
+  $('scanner-btn-row-result').style.display = 'none';
+  $('scanner-hint').textContent = 'Pointez la caméra vers un QR code de Carte de Pote';
+  $('scanner-line').classList.remove('active');
+  setStatus('⏳ INITIALISATION...','');
+  lastScannedProfile = null;
 }
 
-function switchCamera(deviceId){if(deviceId)startCamera(deviceId);}
+async function initCamera(deviceId){
+  // Arrête un éventuel stream précédent
+  stopStream();
+
+  const constraints = {
+    video: deviceId
+      ? {deviceId:{exact:deviceId}, width:{ideal:1280}, height:{ideal:720}}
+      : {facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:720}}
+  };
+
+  try {
+    scannerStream = await navigator.mediaDevices.getUserMedia(constraints);
+  } catch(err) {
+    let msg = '⛔ ACCÈS REFUSÉ';
+    if(err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError')
+      msg = '❌ AUCUNE CAMÉRA';
+    else if(err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')
+      msg = '🔒 PERMISSION REFUSÉE';
+    else if(err.name === 'NotReadableError')
+      msg = '⚠️ CAMÉRA OCCUPÉE';
+    setStatus(msg, 'error');
+    $('scanner-hint').textContent = 'Autorisez l\'accès caméra ou utilisez le bouton Image ci-dessous.';
+    return;
+  }
+
+  const video = $('scanner-video');
+  video.srcObject = scannerStream;
+
+  // Attendre que la vidéo soit prête
+  await new Promise((res, rej) => {
+    video.onloadedmetadata = () => {
+      video.play().then(res).catch(rej);
+    };
+    video.onerror = rej;
+    setTimeout(rej, 8000); // timeout 8s
+  }).catch(() => {
+    setStatus('⚠️ IMPOSSIBLE DE LIRE LA CAMÉRA', 'error');
+    return;
+  });
+
+  // Lister les caméras disponibles
+  await listCameras();
+
+  // Démarrer la ligne animée
+  $('scanner-line').classList.add('active');
+  setStatus('🔍 POINTEZ VERS UN QR CODE', '');
+
+  // Démarrer la boucle de scan
+  scannerPaused = false;
+  startScanLoop();
+}
+
+function startScanLoop(){
+  if(scannerRafId) cancelAnimationFrame(scannerRafId);
+  scannerRafId = requestAnimationFrame(scanLoop);
+}
 
 function scanLoop(){
-  if(!scannerActive)return;
-  const video=$('scanner-video');
-  const canvas=$('scanner-canvas');
-  if(video.readyState===video.HAVE_ENOUGH_DATA){
-    const w=video.videoWidth, h=video.videoHeight;
-    if(w&&h){
-      canvas.width=w; canvas.height=h;
-      const ctx=canvas.getContext('2d');
-      ctx.drawImage(video,0,0,w,h);
-      const imageData=ctx.getImageData(0,0,w,h);
-      if(typeof jsQR!=='undefined'){
-        const code=jsQR(imageData.data,w,h,{inversionAttempts:'dontInvert'});
-        if(code&&!scannerDebounce){
-          handleQRFound(code.data);
-        }
+  if(!scannerActive || scannerPaused){
+    scannerRafId = null;
+    return;
+  }
+
+  const video = $('scanner-video');
+  const canvas = $('scanner-canvas');
+
+  if(video.readyState >= video.HAVE_ENOUGH_DATA && video.videoWidth > 0 && video.videoHeight > 0){
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+
+    // Redimensionner le canvas si nécessaire
+    if(canvas.width !== vw || canvas.height !== vh){
+      canvas.width = vw;
+      canvas.height = vh;
+    }
+
+    const ctx = canvas.getContext('2d', {willReadFrequently: true});
+    ctx.drawImage(video, 0, 0, vw, vh);
+
+    const imageData = ctx.getImageData(0, 0, vw, vh);
+    const code = jsQR(imageData.data, vw, vh, {inversionAttempts:'dontInvert'});
+
+    if(code && code.data){
+      const now = Date.now();
+      if(now - scannerDebounceTs > SCAN_DEBOUNCE_MS){
+        scannerDebounceTs = now;
+        handleQRDetected(code.data);
+        // On continue quand même la boucle jusqu'à ce que handleQRDetected décide de pauser
       }
     }
   }
-  scannerAnimId=requestAnimationFrame(scanLoop);
+
+  scannerRafId = requestAnimationFrame(scanLoop);
 }
 
-function handleQRFound(data){
-  scannerDebounce=true;
-  if(navigator.vibrate)navigator.vibrate([80,30,80]);
+function handleQRDetected(data){
+  // Vibration tactile
+  if(navigator.vibrate) navigator.vibrate([60, 30, 60]);
 
-  // Chercher un profil Carte de Pote (format: #profil=ID ou ?profil=ID)
-  const match=data.match(/[?#&]profil=([^&\s]+)/);
-  if(match){
-    const profileId=match[1];
-    const profiles=getProfiles();
-    const profile=profiles[profileId];
+  // Chercher un identifiant de profil dans les données
+  // Format encodé : cdp://profil/<id>  ou  cdp:profil:<id>  ou  ?profil=<id>  ou  #profil=<id>
+  let profileId = null;
+
+  // Format principal : cdp://profil/<id>
+  let m = data.match(/^cdp:\/\/profil\/([^\s/?#]+)/);
+  if(m) profileId = m[1];
+
+  // Format URL hash : ...#profil=<id>
+  if(!profileId){ m = data.match(/[#?&]profil=([^&\s]+)/); if(m) profileId = m[1]; }
+
+  // Format texte brut : juste l'ID si ça ressemble à profile_<timestamp>
+  if(!profileId && /^profile_\d+$/.test(data.trim())) profileId = data.trim();
+
+  if(profileId){
+    const profiles = getProfiles();
+    const profile = profiles[profileId];
     if(profile){
-      setStatus('✦ PROFIL TROUVÉ !','success');
-      // Arrêter le scan et afficher la fiche inline dans le scanner
-      setTimeout(()=>{
-        pauseScan();
-        showProfileInScanner(profile);
-      },600);
-    }else{
-      setStatus('⚠️ PROFIL NON TROUVÉ — ID INCONNU','error');
-      setTimeout(()=>{setStatus('🔍 POINTEZ VERS UN QR CODE','');scannerDebounce=false;},2500);
+      // Profil trouvé !
+      setStatus('✦ PROFIL TROUVÉ !', 'success');
+      pauseScan();
+      setTimeout(() => showProfileResult(profile), 400);
+    } else {
+      // ID présent mais profil inconnu sur ce navigateur
+      setStatus('⚠️ PROFIL INCONNU — ID: ' + profileId.slice(0,20), 'error');
+      $('scanner-hint').textContent = 'Ce QR code vient d\'un autre appareil ou la fiche a été supprimée.';
+      // On laisse la boucle continuer après un délai
+      scannerDebounceTs = Date.now() + 3000; // 3s supplémentaires
     }
   } else {
-    // QR code valide mais pas un profil Carte de Pote
-    setStatus('ℹ️ QR DÉTECTÉ — NON COMPATIBLE','error');
-    $('scanner-hint').innerHTML='<span style="color:rgba(255,255,255,.5);font-size:10px">'+data.slice(0,60)+(data.length>60?'…':'')+'</span>';
-    setTimeout(()=>{
-      setStatus('🔍 POINTEZ VERS UN QR CODE','');
-      $('scanner-hint').textContent='Scannez le QR code d\'une Carte de Pote pour afficher le profil complet';
-      scannerDebounce=false;
-    },3000);
+    // QR valide mais pas un profil Carte de Pote
+    setStatus('ℹ️ QR DÉTECTÉ (non compatible)', 'info');
+    $('scanner-hint').textContent = data.slice(0, 80) + (data.length > 80 ? '…' : '');
+    scannerDebounceTs = Date.now() + 2500;
+    // Remettre le hint après 4s
+    setTimeout(() => {
+      if(scannerActive && !scannerPaused){
+        $('scanner-hint').textContent = 'Pointez la caméra vers un QR code de Carte de Pote';
+        setStatus('🔍 POINTEZ VERS UN QR CODE', '');
+      }
+    }, 4000);
   }
 }
 
 function pauseScan(){
-  cancelAnimationFrame(scannerAnimId);
-  // Pause vidéo mais garde le stream actif
-  try{$('scanner-video').pause();}catch(e){}
+  scannerPaused = true;
+  if(scannerRafId){ cancelAnimationFrame(scannerRafId); scannerRafId = null; }
+  $('scanner-line').classList.remove('active');
+  try{ $('scanner-video').pause(); }catch(e){}
 }
 
 function resumeScan(){
-  scannerDebounce=false;
-  $('scanner-result-container').innerHTML='';
-  $('scanner-hint').style.display='';
-  setStatus('🔍 POINTEZ VERS UN QR CODE','');
-  try{$('scanner-video').play();}catch(e){}
-  scanLoop();
+  // Réinitialiser l'UI et relancer
+  resetScannerUI();
+  scannerPaused = false;
+  scannerDebounceTs = 0;
+  try{
+    $('scanner-video').play().then(() => {
+      $('scanner-line').classList.add('active');
+      setStatus('🔍 POINTEZ VERS UN QR CODE', '');
+      startScanLoop();
+    }).catch(() => initCamera());
+  } catch(e){ initCamera(); }
 }
 
-// Affichage du profil DIRECTEMENT dans l'interface scanner
-function showProfileInScanner(p){
-  $('scanner-hint').style.display='none';
-  const photoHtml=p.photo
-    ?`<img src="${p.photo}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,168,76,.5);flex-shrink:0">`
-    :`<div style="width:52px;height:52px;border-radius:50%;border:2px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:24px;background:rgba(0,0,0,.3);flex-shrink:0">👤</div>`;
+function showProfileResult(profile){
+  lastScannedProfile = profile;
 
-  const statsHtml=(p.stats&&p.stats.length)?p.stats.map(s=>`
-    <div class="sri-stat">
-      <span class="sri-stat-name">${s.n}</span>
-      <div class="sri-stat-bar"><div class="sri-stat-fill" style="width:${s.v}%"></div></div>
-      <span class="sri-stat-val">${s.v}</span>
-    </div>`).join(''):'';
+  const photoEl = profile.photo
+    ? `<img class="sri-photo" src="${profile.photo}" alt="">`
+    : `<div class="sri-photo-ph">👤</div>`;
 
-  const fautesHtml=(p.fautes&&p.fautes.length)
-    ?p.fautes.map(f=>`<div class="sri-faute">📍 ${f.txt} <span style="color:var(--muted2);font-size:10px">(${f.date})</span></div>`).join('')
-    :`<div style="font-size:11px;color:var(--green)">✓ Aucune faute enregistrée</div>`;
+  const statsEl = (profile.stats && profile.stats.length)
+    ? `<div class="sri-section">📈 STATS</div>` +
+      profile.stats.map(s => `
+        <div class="sri-stat">
+          <span class="sri-stat-name">${esc(s.n)}</span>
+          <div class="sri-stat-bar"><div class="sri-stat-fill" style="width:${clamp(s.v,0,100)}%"></div></div>
+          <span class="sri-stat-val">${s.v}</span>
+        </div>`).join('')
+    : '';
 
-  const bioHtml=p.bio?`<div style="font-size:11px;color:var(--muted2);font-style:italic;margin-bottom:8px;line-height:1.5;">"${p.bio}"</div>`:'';
+  const fautesEl = (profile.fautes && profile.fautes.length)
+    ? `<div class="sri-section">⚠️ FAUTES (${profile.fautes.length})</div>` +
+      profile.fautes.map(f => `<div class="sri-faute">📍 ${esc(f.txt)} <span style="color:var(--muted2)">(${esc(f.date)})</span></div>`).join('')
+    : `<div style="font-size:11px;color:var(--green);margin-top:6px">✓ Aucune faute enregistrée</div>`;
 
-  $('scanner-result-container').innerHTML=`
-    <div class="scanner-result-inline">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-        ${photoHtml}
-        <div>
-          <div class="sri-name">${p.prenom} ${p.nom}</div>
-          <div class="sri-mat">MATRICULE : ${p.matricule}</div>
-        </div>
+  const bioEl = profile.bio
+    ? `<div class="sri-bio">"${esc(profile.bio)}"</div>`
+    : '';
+
+  $('scanner-result').innerHTML = `
+    <div class="sri-header">
+      ${photoEl}
+      <div>
+        <div class="sri-name">${esc(profile.prenom)} ${esc(profile.nom)}</div>
+        <div class="sri-mat">MATRICULE : ${esc(profile.matricule)}</div>
       </div>
-      ${bioHtml}
-      ${statsHtml?`<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--gold);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(201,168,76,.2);">📈 STATS</div><div class="sri-stats">${statsHtml}</div>`:''}
-      ${p.fautes&&p.fautes.length?`<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--gold);margin:8px 0 6px;padding-bottom:4px;border-bottom:1px solid rgba(201,168,76,.2);">⚠️ FAUTES (${p.fautes.length})</div>${fautesHtml}`:`<div style="margin-top:6px">${fautesHtml}</div>`}
-      <div class="sri-btn-row">
-        <button class="sri-btn" onclick="closeScanner();openFiche(getProfiles()['${p.id}'])">🔎 Fiche complète</button>
-        <button class="sri-btn" onclick="resumeScan()">📷 Re-scanner</button>
-        <button class="sri-btn danger" onclick="closeScanner()">✕ Fermer</button>
-      </div>
-    </div>`;
+    </div>
+    ${bioEl}
+    ${statsEl}
+    ${fautesEl}
+  `;
+  $('scanner-result').classList.add('show');
+  $('scanner-btn-row-scan').style.display = 'none';
+  $('scanner-btn-row-result').style.display = '';
+  $('scanner-hint').textContent = '';
 }
 
-function setStatus(msg,type){
-  const el=$('scanner-status');
-  el.textContent=msg;
-  el.className='scanner-status'+(type?' '+type:'');
+function openFicheFromResult(){
+  if(lastScannedProfile){
+    closeScanner();
+    setTimeout(() => openFiche(lastScannedProfile), 150);
+  }
+}
+
+function setStatus(msg, type){
+  const el = $('scanner-status');
+  el.textContent = msg;
+  el.className = 'scanner-status' + (type ? ' ' + type : '');
+}
+
+function stopStream(){
+  if(scannerRafId){ cancelAnimationFrame(scannerRafId); scannerRafId = null; }
+  if(scannerStream){ scannerStream.getTracks().forEach(t => t.stop()); scannerStream = null; }
+  const video = $('scanner-video');
+  if(video){ video.srcObject = null; }
+  $('scanner-line').classList.remove('active');
 }
 
 function closeScanner(){
-  scannerActive=false;
-  cancelAnimationFrame(scannerAnimId);
-  if(scannerStream){scannerStream.getTracks().forEach(t=>t.stop());scannerStream=null;}
-  const video=$('scanner-video');
-  if(video)video.srcObject=null;
+  scannerActive = false;
+  scannerPaused = false;
+  stopStream();
   $('scanner-overlay').classList.remove('show');
-  $('scanner-cam-select').style.display='none';
-  $('scanner-cam-select').innerHTML='';
-  $('scanner-result-container').innerHTML='';
+  $('scanner-cam-select').style.display = 'none';
+  $('scanner-cam-select').innerHTML = '';
+  resetScannerUI();
 }
 
-$('scanner-overlay').addEventListener('click',e=>{
-  if(e.target===$('scanner-overlay'))closeScanner();
+async function listCameras(){
+  try{
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cams = devices.filter(d => d.kind === 'videoinput');
+    const sel = $('scanner-cam-select');
+    if(cams.length > 1){
+      sel.innerHTML = cams.map((c,i) => `<option value="${c.deviceId}">${c.label || 'Caméra ' + (i+1)}</option>`).join('');
+      // Sélectionner la caméra arrière si possible
+      const backCam = cams.find(c => /back|rear|environment|arrière/i.test(c.label));
+      if(backCam) sel.value = backCam.deviceId;
+      sel.style.display = '';
+    } else {
+      sel.style.display = 'none';
+    }
+  } catch(e){
+    $('scanner-cam-select').style.display = 'none';
+  }
+}
+
+function switchCamera(deviceId){
+  if(!deviceId) return;
+  pauseScan();
+  initCamera(deviceId);
+}
+
+// ── Scan depuis une image (fallback) ──
+function scanFromImage(){
+  $('scanner-img-input').click();
+}
+
+function handleScanImage(inp){
+  const file = inp.files[0];
+  if(!file) return;
+  if(!isJsQRReady()){ toast('jsQR non chargé !'); return; }
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width = img.width; cv.height = img.height;
+      const ctx = cv.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, img.width, img.height);
+      const code = jsQR(imageData.data, img.width, img.height, {inversionAttempts:'attemptBoth'});
+      if(code && code.data){
+        setStatus('✦ QR DÉTECTÉ !', 'success');
+        handleQRDetected(code.data);
+      } else {
+        setStatus('❌ AUCUN QR CODE DANS L\'IMAGE', 'error');
+        setTimeout(() => setStatus('🔍 POINTEZ VERS UN QR CODE', ''), 3000);
+      }
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  inp.value = '';
+}
+
+// Fermer le scanner en cliquant sur le fond
+$('scanner-overlay').addEventListener('click', e => {
+  if(e.target === $('scanner-overlay')) closeScanner();
 });
+
+// Fonction utilitaire pour échapper le HTML
+function esc(str){ return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // ═══════════════════════════════════════
 // MOBILE PANEL SYSTEM
@@ -973,39 +1221,24 @@ function getMobBlocksHTML(){
     <div class="bchip" onclick="addBlock('citation',20,60);closeMobPanel()"><span class="bchip-ico">💬</span><span class="bchip-lbl">Citation</span></div>
     <div class="bchip" onclick="addBlock('serial',20,20);closeMobPanel()"><span class="bchip-ico">🔢</span><span class="bchip-lbl">N° série</span></div>
   </div>
-  <div class="catlabel">📋 Tableaux & Listes</div>
+  <div class="catlabel">📋 Tableaux</div>
   <div class="bgrid">
     <div class="bchip" onclick="addBlock('checklist',20,60);closeMobPanel()"><span class="bchip-ico">✅</span><span class="bchip-lbl">Checklist</span></div>
     <div class="bchip" onclick="addBlock('tableau',20,60);closeMobPanel()"><span class="bchip-ico">📊</span><span class="bchip-lbl">Tableau</span></div>
-    <div class="bchip" onclick="addBlock('regles',20,60);closeMobPanel()"><span class="bchip-ico">📜</span><span class="bchip-lbl">Règles</span></div>
-    <div class="bchip" onclick="addBlock('infobox',20,60);closeMobPanel()"><span class="bchip-ico">🗂️</span><span class="bchip-lbl">Info-box</span></div>
     <div class="bchip" onclick="addBlock('stats',20,60);closeMobPanel()"><span class="bchip-ico">📈</span><span class="bchip-lbl">Stats</span></div>
-    <div class="bchip" onclick="addBlock('etoiles',20,60);closeMobPanel()"><span class="bchip-ico">⭐</span><span class="bchip-lbl">Étoiles</span></div>
     <div class="bchip" onclick="addBlock('jauge',20,60);closeMobPanel()"><span class="bchip-ico">🔋</span><span class="bchip-lbl">Jauge</span></div>
-    <div class="bchip" onclick="addBlock('consignes',20,60);closeMobPanel()"><span class="bchip-ico">⚠️</span><span class="bchip-lbl">Consignes</span></div>
-  </div>
-  <div class="catlabel">🖼️ Images</div>
-  <div class="bgrid">
-    <div class="bchip" onclick="addImageBlock();closeMobPanel()"><span class="bchip-ico">🖼️</span><span class="bchip-lbl">Image</span></div>
-    <div class="bchip" onclick="changeBgImage();closeMobPanel()"><span class="bchip-ico">🌄</span><span class="bchip-lbl">Fond image</span></div>
   </div>
   <div class="catlabel">🎨 Déco</div>
   <div class="bgrid">
     <div class="bchip" onclick="addBlock('icone',20,20);closeMobPanel()"><span class="bchip-ico">🌟</span><span class="bchip-lbl">Icône</span></div>
-    <div class="bchip" onclick="addBlock('iconrow',20,20);closeMobPanel()"><span class="bchip-ico">🎭</span><span class="bchip-lbl">Rangée</span></div>
-    <div class="bchip" onclick="addBlock('separateur',20,60);closeMobPanel()"><span class="bchip-ico">➖</span><span class="bchip-lbl">Séparateur</span></div>
-    <div class="bchip" onclick="addBlock('cadre',20,60);closeMobPanel()"><span class="bchip-ico">🔲</span><span class="bchip-lbl">Cadre</span></div>
     <div class="bchip" onclick="addBlock('ruban',20,60);closeMobPanel()"><span class="bchip-ico">🎀</span><span class="bchip-lbl">Ruban</span></div>
     <div class="bchip" onclick="addBlock('tampon',20,60);closeMobPanel()"><span class="bchip-ico">🔵</span><span class="bchip-lbl">Tampon</span></div>
-    <div class="bchip" onclick="addBlock('coin',20,20);closeMobPanel()"><span class="bchip-ico">🔱</span><span class="bchip-lbl">Coin déco</span></div>
-    <div class="bchip" onclick="addBlock('filigrane',20,60);closeMobPanel()"><span class="bchip-ico">💧</span><span class="bchip-lbl">Filigrane</span></div>
+    <div class="bchip" onclick="addImageBlock();closeMobPanel()"><span class="bchip-ico">🖼️</span><span class="bchip-lbl">Image</span></div>
   </div>
   <div class="catlabel">🔲 QR & Tech</div>
   <div class="bgrid">
     <div class="bchip" onclick="openQRProfileModal();closeMobPanel()"><span class="bchip-ico">🪪</span><span class="bchip-lbl">QR Profil</span></div>
     <div class="bchip" onclick="addBlock('barcode',20,60);closeMobPanel()"><span class="bchip-ico">▐▌▐▌</span><span class="bchip-lbl">Barcode</span></div>
-    <div class="bchip" onclick="addBlock('puce',20,60);closeMobPanel()"><span class="bchip-ico">💳</span><span class="bchip-lbl">Puce NFC</span></div>
-    <div class="bchip" onclick="addBlock('matrice',20,60);closeMobPanel()"><span class="bchip-ico">🔳</span><span class="bchip-lbl">Matrice</span></div>
   </div>
   </div>`;
 }
@@ -1039,17 +1272,17 @@ function getMobSavesHTML(){
 
 function getMobPropsHTML(){
   const b=BLK.find(x=>x.id===SEL);
-  if(!b)return`<div style="padding:20px;text-align:center"><div style="font-size:32px;opacity:.3;margin-bottom:10px">⚙️</div><div style="font-size:12px;color:var(--muted2)">Sélectionne un bloc sur la carte pour modifier ses propriétés.</div></div>`;
+  if(!b)return`<div style="padding:20px;text-align:center"><div style="font-size:32px;opacity:.3;margin-bottom:10px">⚙️</div><div style="font-size:12px;color:var(--muted2)">Sélectionne un bloc sur la carte.</div></div>`;
   showProps(b);
   return `<div style="padding:12px">${$('props').innerHTML}</div>`;
 }
 
 function openMobPanel(type,btn){
   if(!isMobile()){
-    if(type==='blocs'){switchLP('blocks',null);}
-    else if(type==='tpl'){switchLP('tpl',null);}
-    else if(type==='carte'){switchLP('carte',null);}
-    else if(type==='saves'){switchLP('saves',null);}
+    if(type==='blocs')switchLP('blocks',null);
+    else if(type==='tpl')switchLP('tpl',null);
+    else if(type==='carte')switchLP('carte',null);
+    else if(type==='saves')switchLP('saves',null);
     return;
   }
   mobPanelActive=type;
@@ -1213,11 +1446,11 @@ const DEF={
   barcode:{w:180,h:50,op:100},
   puce:{w:60,h:44,op:100},
   matrice:{w:70,h:70,op:100},
-  qr:{w:80,h:80,profileId:null,op:100},
+  qr:{w:90,h:90,profileId:null,text:'',op:100},
 };
 
 // ═══════════════════════════════════════
-// DRAG
+// DRAG & DROP
 // ═══════════════════════════════════════
 let dragType=null;
 function dstart(e,t){e.dataTransfer.setData('btype',t);dragType=t;}
@@ -1257,7 +1490,7 @@ function handleCellImg(inp){
 }
 
 // ═══════════════════════════════════════
-// QR PROFILE
+// QR PROFILE — GÉNÉRATION & STOCKAGE
 // ═══════════════════════════════════════
 function openQRProfileModal(){
   qrPhotoData=null;
@@ -1278,7 +1511,7 @@ function handleQRPhoto(inp){
 function renderQRStatsEdit(){
   $('qr-stats-edit').innerHTML=qrStats.map((s,i)=>`
     <div class="stat-edit-item">
-      <input type="text" value="${s.n}" oninput="qrStats[${i}].n=this.value" placeholder="Stat...">
+      <input type="text" value="${esc(s.n)}" oninput="qrStats[${i}].n=this.value" placeholder="Stat...">
       <input type="range" min="0" max="100" value="${s.v}" oninput="qrStats[${i}].v=+this.value;this.nextElementSibling.textContent=this.value">
       <span class="stat-edit-val">${s.v}</span>
       <button class="cl-rm" onclick="qrStats.splice(${i},1);renderQRStatsEdit()">✕</button>
@@ -1288,7 +1521,7 @@ function addQRStat(){qrStats.push({n:'Nouvelle stat',v:50});renderQRStatsEdit();
 function renderQRFautesEdit(){
   $('qr-fautes-edit').innerHTML=qrFautes.map((f,i)=>`
     <div class="faute-item">
-      <input type="text" value="${f.txt}" oninput="qrFautes[${i}].txt=this.value" placeholder="Description...">
+      <input type="text" value="${esc(f.txt)}" oninput="qrFautes[${i}].txt=this.value" placeholder="Description...">
       <input type="date" value="${f.date}" oninput="qrFautes[${i}].date=this.value">
       <button class="faute-rm" onclick="qrFautes.splice(${i},1);renderQRFautesEdit()">✕</button>
     </div>`).join('');
@@ -1301,37 +1534,58 @@ function generateQRProfile(){
   const matricule=$('qr-matricule').value.trim()||'#0000';
   const bio=$('qr-bio').value.trim();
   const profileId='profile_'+Date.now();
-  const profile={id:profileId,prenom,nom,matricule,bio,photo:qrPhotoData,stats:deepCopy(qrStats),fautes:qrFautes.filter(f=>f.txt.trim())};
-  const profiles=getProfiles();profiles[profileId]=profile;
+
+  const profile={
+    id:profileId,prenom,nom,matricule,bio,
+    photo:qrPhotoData,
+    stats:deepCopy(qrStats),
+    fautes:qrFautes.filter(f=>f.txt.trim())
+  };
+
+  // Sauvegarder le profil
+  const profiles=getProfiles();
+  profiles[profileId]=profile;
   localStorage.setItem('cdp_profiles',JSON.stringify(profiles));
-  const url=window.location.href.split('#')[0]+'#profil='+profileId;
-  const b=addBlock('qr',40,40,{profileId,text:url,w:90,h:90});
-  setTimeout(()=>buildQR(b),100);
-  closeQRModal();toast('✦ QR Profil créé pour '+prenom+' '+nom+' !');
+
+  // URL encodée dans le QR (format : cdp://profil/<id>)
+  const qrUrl='cdp://profil/'+profileId;
+
+  // Ajouter le bloc QR sur la carte
+  const b=addBlock('qr',40,40,{profileId,text:qrUrl,w:100,h:100});
+  setTimeout(()=>buildQR(b),120);
+
+  closeQRModal();
+  toast('✦ Profil créé pour '+prenom+' '+nom+' !');
 }
 
-function getProfiles(){try{return JSON.parse(localStorage.getItem('cdp_profiles')||'{}');}catch(e){return{};}}
+function getProfiles(){
+  try{return JSON.parse(localStorage.getItem('cdp_profiles')||'{}');}
+  catch(e){return{};}
+}
 
 function buildQR(b){
-  const el=document.getElementById('qr-inner-'+b.id);if(!el)return;
+  const el=document.getElementById('qr-inner-'+b.id);
+  if(!el)return;
   el.innerHTML='';
-  try{new QRCode(el,{text:b.text||window.location.href,width:b.w-8,height:b.h-8,colorDark:'#ffffff',colorLight:'transparent',correctLevel:QRCode.CorrectLevel.M});}catch(e){}
+  if(typeof QRCode==='undefined'){el.textContent='[QR]';return;}
+  try{
+    new QRCode(el,{
+      text:b.text||'cdp://profil/unknown',
+      width:b.w-8,height:b.h-8,
+      colorDark:'#ffffff',colorLight:'transparent',
+      correctLevel:QRCode.CorrectLevel.M
+    });
+  }catch(e){el.textContent='[QR ERR]';}
 }
-
-function checkHashProfile(){
-  const hash=window.location.hash;const m=hash.match(/#profil=(.+)/);
-  if(m){const p=getProfiles()[m[1]];if(p)openFiche(p);}
-}
-window.addEventListener('hashchange',checkHashProfile);
 
 function openFiche(p){
   if(!p)return;
   const fc=$('fiche-content');
   const photoHtml=p.photo?`<img src="${p.photo}" class="fiche-photo">`:`<div class="fiche-photo-placeholder">👤</div>`;
-  const statsHtml=p.stats&&p.stats.length?`<div class="fiche-section"><div class="fiche-section-title">📈 Stats</div><div class="fiche-stats">${p.stats.map(s=>`<div class="fiche-stat-row"><span class="fiche-stat-name">${s.n}</span><div class="fiche-stat-bar"><div class="fiche-stat-fill" style="width:${s.v}%"></div></div><span class="fiche-stat-val">${s.v}</span></div>`).join('')}</div></div>`:'';
-  const fautesHtml=p.fautes&&p.fautes.length?`<div class="fiche-section"><div class="fiche-section-title">⚠️ Fautes & Infractions (${p.fautes.length})</div><div class="fiche-fautes">${p.fautes.map(f=>`<div class="fiche-faute-item"><span class="fiche-faute-txt">📍 ${f.txt}</span><span class="fiche-faute-date">${f.date}</span></div>`).join('')}</div></div>`:`<div class="fiche-section"><div class="fiche-section-title">⚠️ Fautes</div><div style="font-size:12px;color:var(--green)">✓ Aucune faute enregistrée</div></div>`;
-  const bioHtml=p.bio?`<div class="fiche-section"><div class="fiche-section-title">💬 Bio</div><div style="font-size:13px;color:var(--muted2);line-height:1.5;font-style:italic">"${p.bio}"</div></div>`:'';
-  fc.innerHTML=`<div class="fiche-badge">✦ CARTE DE POTE ✦</div><div class="fiche-header">${photoHtml}<div><div class="fiche-name">${p.prenom} ${p.nom}</div><div class="fiche-matricule">MATRICULE : ${p.matricule}</div></div></div>${bioHtml}${statsHtml}${fautesHtml}<div style="text-align:center;margin-top:16px"><button onclick="closeFiche()" style="background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:8px;color:var(--gold2);font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;padding:8px 20px;cursor:pointer">✕ FERMER</button></div>`;
+  const statsHtml=p.stats&&p.stats.length?`<div class="fiche-section"><div class="fiche-section-title">📈 Stats</div><div class="fiche-stats">${p.stats.map(s=>`<div class="fiche-stat-row"><span class="fiche-stat-name">${esc(s.n)}</span><div class="fiche-stat-bar"><div class="fiche-stat-fill" style="width:${clamp(s.v,0,100)}%"></div></div><span class="fiche-stat-val">${s.v}</span></div>`).join('')}</div></div>`:'';
+  const fautesHtml=p.fautes&&p.fautes.length?`<div class="fiche-section"><div class="fiche-section-title">⚠️ Fautes & Infractions (${p.fautes.length})</div><div class="fiche-fautes">${p.fautes.map(f=>`<div class="fiche-faute-item"><span class="fiche-faute-txt">📍 ${esc(f.txt)}</span><span class="fiche-faute-date">${esc(f.date)}</span></div>`).join('')}</div></div>`:`<div class="fiche-section"><div class="fiche-section-title">⚠️ Fautes</div><div style="font-size:12px;color:var(--green)">✓ Aucune faute enregistrée</div></div>`;
+  const bioHtml=p.bio?`<div class="fiche-section"><div class="fiche-section-title">💬 Bio</div><div style="font-size:13px;color:var(--muted2);line-height:1.5;font-style:italic">"${esc(p.bio)}"</div></div>`:'';
+  fc.innerHTML=`<div class="fiche-badge">✦ CARTE DE POTE ✦</div><div class="fiche-header">${photoHtml}<div><div class="fiche-name">${esc(p.prenom)} ${esc(p.nom)}</div><div class="fiche-matricule">MATRICULE : ${esc(p.matricule)}</div></div></div>${bioHtml}${statsHtml}${fautesHtml}<div style="text-align:center;margin-top:16px"><button onclick="closeFiche()" style="background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);border-radius:8px;color:var(--gold2);font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;padding:8px 20px;cursor:pointer">✕ FERMER</button></div>`;
   $('fiche-overlay').classList.add('show');
 }
 function closeFiche(){$('fiche-overlay').classList.remove('show');}
@@ -1399,7 +1653,10 @@ function getHTML(b){
     case 'matrice':
       return`<div style="width:100%;height:100%;display:grid;grid-template-columns:repeat(8,1fr);gap:1px;padding:3px">${Array.from({length:64},()=>`<div style="background:rgba(255,255,255,${Math.random()>.45?.7:.05});border-radius:1px;aspect-ratio:1"></div>`).join('')}</div>`;
     case 'qr':
-      return`<div style="display:flex;flex-direction:column;align-items:center;width:100%;height:100%;gap:3px"><div id="qr-inner-${b.id}" style="flex:1;width:100%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border-radius:6px;overflow:hidden"></div>${b.profileId?`<div style="font-family:'Cinzel',serif;font-size:6px;color:rgba(201,168,76,.7);letter-spacing:1px">SCAN PROFIL</div>`:''}</div>`;
+      return`<div style="display:flex;flex-direction:column;align-items:center;width:100%;height:100%;gap:3px">
+        <div id="qr-inner-${b.id}" style="flex:1;width:100%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden"></div>
+        ${b.profileId?`<div style="font-family:'Cinzel',serif;font-size:6px;color:rgba(201,168,76,.7);letter-spacing:1px">SCAN PROFIL</div>`:''}
+      </div>`;
     default:
       return`<div style="width:100%;height:100%;border:1px dashed rgba(255,255,255,.2);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.3)">${b.type}</div>`;
   }
@@ -1677,9 +1934,9 @@ function showProps(b){
     const p=b.profileId?getProfiles()[b.profileId]:null;
     h+=`<div class="psec"><div class="ptitle">🪪 QR Profil</div>
       ${p?`<div style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);border-radius:7px;padding:10px;margin-bottom:8px">
-        <div style="font-weight:700;color:var(--gold2)">${p.prenom} ${p.nom}</div>
-        <div style="font-size:10px;color:var(--muted2)">${p.matricule} · ${(p.fautes||[]).length} faute(s)</div>
-        <button class="addrow-btn" style="margin-top:6px" onclick="const p=getProfiles()['${b.profileId}'];if(p)openFiche(p)">👁 Voir la fiche</button>
+        <div style="font-weight:700;color:var(--gold2)">${esc(p.prenom)} ${esc(p.nom)}</div>
+        <div style="font-size:10px;color:var(--muted2)">${esc(p.matricule)} · ${(p.fautes||[]).length} faute(s)</div>
+        <button class="addrow-btn" style="margin-top:6px" onclick="openFiche(getProfiles()['${b.profileId}'])">👁 Voir la fiche</button>
       </div>`:`<div style="font-size:11px;color:var(--muted2);margin-bottom:8px">QR sans profil lié</div>`}
       <button class="addrow-btn" onclick="openQRProfileModal()">✏️ Nouveau profil QR</button>
     </div>`;
@@ -1899,9 +2156,7 @@ function exportPNG(){
 // ═══════════════════════════════════════
 renderGradStops();
 loadTpl('classic');
-checkHashProfile();
 
-// Double rAF : attend que le navigateur peigne le layout
 requestAnimationFrame(()=>{
   requestAnimationFrame(()=>{
     resizeCard();
