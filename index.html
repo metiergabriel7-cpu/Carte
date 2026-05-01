@@ -10547,6 +10547,137 @@ select.pinp option{background:#1a1a2e;}
   .scanner-hint{display:none;}
   .scanner-result{max-height:35vh;}
 }
+
+/* ═══════════════ ADMIN PANEL ═══════════════ */
+.admin-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.88);
+  z-index:4000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  overflow-y:auto;
+}
+.admin-overlay.show{display:flex;}
+
+.admin-panel{
+  background:var(--panel);
+  border:1px solid rgba(201,168,76,.3);
+  border-radius:18px;
+  width:100%;max-width:680px;
+  max-height:90vh;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 0 80px rgba(201,168,76,.1),0 30px 80px rgba(0,0,0,.8);
+}
+
+.admin-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  background:linear-gradient(135deg,rgba(201,168,76,.08),transparent);
+}
+.admin-title{
+  font-family:'Cinzel',serif;
+  font-size:13px;letter-spacing:3px;
+  color:var(--gold2);font-weight:700;
+}
+.admin-badge{
+  font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;
+  background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.4);
+  border-radius:10px;padding:3px 10px;color:var(--gold2);
+}
+.admin-close{
+  background:none;border:1px solid var(--border);border-radius:6px;
+  color:var(--muted2);font-size:16px;padding:4px 8px;cursor:pointer;
+  transition:all .15s;
+}
+.admin-close:hover{border-color:var(--red);color:var(--red);}
+
+.admin-tabs{
+  display:flex;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.admin-tab{
+  flex:1;background:none;border:none;border-bottom:2px solid transparent;
+  color:var(--muted2);font-family:'Crimson Pro',serif;
+  font-size:12px;font-weight:600;padding:10px 4px;cursor:pointer;
+  transition:all .15s;
+}
+.admin-tab.on{color:var(--gold2);border-bottom-color:var(--gold);}
+
+.admin-content{
+  flex:1;overflow-y:auto;padding:16px;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+}
+
+.admin-search-row{
+  display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap;
+}
+.admin-search{
+  flex:1;min-width:160px;
+  background:var(--panel2);border:1px solid var(--border);
+  border-radius:7px;color:var(--text);font-family:'Crimson Pro',serif;
+  font-size:13px;padding:7px 11px;outline:none;
+  transition:border-color .15s;
+}
+.admin-search:focus{border-color:var(--gold);}
+
+.admin-btn{
+  background:rgba(201,168,76,.1);
+  border:1px solid rgba(201,168,76,.35);
+  border-radius:7px;color:var(--gold2);
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;
+  padding:7px 14px;cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.admin-btn:hover{background:rgba(201,168,76,.25);}
+.admin-btn.gold{background:var(--gold);color:#1a1000;font-weight:700;border-color:var(--gold);}
+.admin-btn.gold:hover{background:var(--gold2);}
+.admin-btn.danger{background:rgba(224,82,82,.1);border-color:rgba(224,82,82,.3);color:var(--red);}
+.admin-btn.danger:hover{background:rgba(224,82,82,.2);}
+
+.admin-filter{
+  background:var(--panel2);border:1px solid var(--border);
+  border-radius:6px;color:var(--text);font-family:'Crimson Pro',serif;
+  font-size:12px;padding:5px 8px;cursor:pointer;outline:none;
+  max-width:200px;
+}
+.admin-filter option{background:#1a1a2e;}
+
+.admin-profile-card{
+  background:var(--panel2);border:1px solid var(--border);
+  border-radius:10px;padding:12px 14px;margin-bottom:8px;
+  transition:border-color .15s;
+}
+.admin-profile-card:hover{border-color:rgba(201,168,76,.3);}
+
+.admin-faute-row{
+  background:rgba(224,82,82,.05);
+  border:1px solid rgba(224,82,82,.15);
+  border-radius:8px;padding:10px 14px;margin-bottom:6px;
+  transition:border-color .15s;
+}
+.admin-faute-row:hover{border-color:rgba(224,82,82,.35);}
+
+.admin-params-section{
+  background:var(--panel2);border:1px solid var(--border);
+  border-radius:10px;padding:14px 16px;
+}
+.admin-params-title{
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;
+  color:var(--gold);margin-bottom:12px;padding-bottom:6px;
+  border-bottom:1px solid var(--border);
+}
+.admin-stat-card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:8px;padding:12px;text-align:center;
+}
+
+/* ═══ Ajout topbar admin btn ═══ */
+@media (max-width:640px){
+  .admin-panel{max-height:95vh;border-radius:14px;}
+}
 </style>
 </head>
 <body>
@@ -10881,6 +11012,125 @@ select.pinp option{background:#1a1a2e;}
   <div class="fiche-card" id="fiche-card">
     <button class="fiche-close" onclick="closeFiche()">✕</button>
     <div id="fiche-content"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     MODAL LOGIN ADMIN
+     ═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="admin-login-modal">
+  <div class="modal" style="max-width:360px">
+    <h3>🛡️ ACCÈS ADMIN</h3>
+    <div class="mrow">
+      <label>Mot de passe admin</label>
+      <input id="admin-pwd-inp" type="password" placeholder="••••••••" autocomplete="off" onkeydown="if(event.key==='Enter')tryAdminLogin()">
+    </div>
+    <div id="admin-login-err" style="color:var(--red);font-size:11px;margin-top:-6px;margin-bottom:8px;display:none">❌ Mot de passe incorrect</div>
+    <div class="modal-btns">
+      <button onclick="closeAdminLogin()">Annuler</button>
+      <button class="ok" onclick="tryAdminLogin()">🛡️ Connexion</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PANNEAU ADMIN — tableau de bord complet
+     ═══════════════════════════════════════════ -->
+<div class="admin-overlay" id="admin-overlay">
+  <div class="admin-panel">
+    <div class="admin-header">
+      <div class="admin-title">🛡️ TABLEAU DE BORD ADMIN</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="admin-badge">ACCÈS TOTAL</div>
+        <button class="admin-close" onclick="closeAdmin()">✕</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="admin-tabs">
+      <button class="admin-tab on" onclick="switchAdminTab('profils',this)">👥 Profils</button>
+      <button class="admin-tab" onclick="switchAdminTab('fautes',this)">⚠️ Fautes</button>
+      <button class="admin-tab" onclick="switchAdminTab('params',this)">⚙️ Paramètres</button>
+    </div>
+
+    <!-- Tab: Profils -->
+    <div class="admin-content" id="admin-tab-profils">
+      <div class="admin-search-row">
+        <input type="text" id="admin-search" placeholder="🔍 Rechercher un profil..." oninput="renderAdminProfils()" class="admin-search">
+        <button class="admin-btn gold" onclick="openQRProfileModal();closeAdmin()">+ Nouveau profil</button>
+      </div>
+      <div id="admin-profils-list"></div>
+    </div>
+
+    <!-- Tab: Fautes -->
+    <div class="admin-content" id="admin-tab-fautes" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--gold)">TOUTES LES FAUTES SIGNALÉES</div>
+        <select class="admin-filter" id="admin-faute-filter" onchange="renderAdminFautes()">
+          <option value="">Tous les profils</option>
+        </select>
+      </div>
+      <div id="admin-fautes-list"></div>
+    </div>
+
+    <!-- Tab: Paramètres -->
+    <div class="admin-content" id="admin-tab-params" style="display:none">
+      <div class="admin-params-section">
+        <div class="admin-params-title">🔐 Sécurité admin</div>
+        <div class="mrow" style="margin-bottom:8px">
+          <label style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);display:block;margin-bottom:4px">Nouveau mot de passe admin</label>
+          <input id="admin-new-pwd" type="password" placeholder="Nouveau mot de passe" style="width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:13px;padding:7px 9px;outline:none">
+        </div>
+        <button class="admin-btn" onclick="changeAdminPwd()">💾 Changer le mot de passe</button>
+      </div>
+      <div class="admin-params-section" style="margin-top:16px">
+        <div class="admin-params-title">🗑️ Gestion des données</div>
+        <button class="admin-btn danger" onclick="if(confirm('Supprimer TOUS les profils ?'))deleteAllProfiles()">🗑️ Supprimer tous les profils</button>
+        <button class="admin-btn danger" style="margin-top:6px" onclick="if(confirm('Supprimer TOUTES les fautes ?'))deleteAllFautes()">⚠️ Vider toutes les fautes</button>
+      </div>
+      <div class="admin-params-section" style="margin-top:16px">
+        <div class="admin-params-title">📊 Statistiques</div>
+        <div id="admin-stats-box"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL SIGNALER UNE FAUTE (utilisateurs)
+     ═══════════════════════════════════════════ -->
+<div class="modal-overlay" id="faute-modal">
+  <div class="modal" style="max-width:420px">
+    <h3>⚠️ SIGNALER UNE FAUTE</h3>
+    <div id="faute-target-info" style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:22px">👤</span>
+      <div>
+        <div style="font-family:'Cinzel',serif;font-size:13px;color:var(--gold2)" id="faute-target-name">—</div>
+        <div style="font-size:10px;color:var(--muted2)" id="faute-target-mat">—</div>
+      </div>
+    </div>
+    <div class="mrow">
+      <label>Description de la faute</label>
+      <textarea id="faute-desc-inp" placeholder="Ex: A oublié d'apporter la pizza, A trahi le groupe lors de la session du 15..." style="min-height:80px"></textarea>
+    </div>
+    <div class="mrow">
+      <label>Date</label>
+      <input id="faute-date-inp" type="date">
+    </div>
+    <div class="mrow">
+      <label>Gravité</label>
+      <select id="faute-gravite-inp">
+        <option value="mineure">⚡ Mineure — Oubli, petit manquement</option>
+        <option value="moderee">⚠️ Modérée — Comportement problématique</option>
+        <option value="grave">🔴 Grave — Trahison, acte sérieux</option>
+      </select>
+    </div>
+    <div id="faute-modal-err" style="color:var(--red);font-size:11px;margin-top:-6px;margin-bottom:6px;display:none"></div>
+    <div class="modal-btns">
+      <button onclick="closeFauteModal()">Annuler</button>
+      <button class="ok" style="background:var(--red);border-color:var(--red)" onclick="submitFaute()">⚠️ Signaler</button>
+    </div>
   </div>
 </div>
 
@@ -12265,6 +12515,369 @@ requestAnimationFrame(()=>{
     resizeCard();
   });
 });
+
+// ═══════════════════════════════════════════════════════
+// SYSTÈME ADMIN & FAUTES — COMPLET
+// ═══════════════════════════════════════════════════════
+
+const ADMIN_PWD_KEY = 'cdp_admin_pwd';
+const ADMIN_SESSION_KEY = 'cdp_admin_session';
+const DEFAULT_ADMIN_PWD = 'admin2025'; // mot de passe par défaut
+
+let fauteTargetProfileId = null;
+
+// ── Helpers ──
+function getAdminPwd(){ return localStorage.getItem(ADMIN_PWD_KEY) || DEFAULT_ADMIN_PWD; }
+function isAdminSession(){ return sessionStorage.getItem(ADMIN_SESSION_KEY) === '1'; }
+function setAdminSession(){ sessionStorage.setItem(ADMIN_SESSION_KEY, '1'); }
+function clearAdminSession(){ sessionStorage.removeItem(ADMIN_SESSION_KEY); }
+
+// ── Ouvrir admin (avec ou sans login) ──
+function openAdminPanel(){
+  if(isAdminSession()){
+    showAdminPanel();
+  } else {
+    $('admin-pwd-inp').value = '';
+    $('admin-login-err').style.display = 'none';
+    $('admin-login-modal').classList.add('show');
+    setTimeout(() => $('admin-pwd-inp').focus(), 150);
+  }
+}
+function closeAdminLogin(){ $('admin-login-modal').classList.remove('show'); }
+function tryAdminLogin(){
+  const pwd = $('admin-pwd-inp').value;
+  if(pwd === getAdminPwd()){
+    setAdminSession();
+    closeAdminLogin();
+    showAdminPanel();
+  } else {
+    $('admin-login-err').style.display = '';
+    $('admin-pwd-inp').value = '';
+    $('admin-pwd-inp').focus();
+  }
+}
+$('admin-login-modal').addEventListener('click', e => { if(e.target === $('admin-login-modal')) closeAdminLogin(); });
+
+function showAdminPanel(){
+  $('admin-overlay').classList.add('show');
+  renderAdminProfils();
+  renderAdminFautes();
+  renderAdminStats();
+}
+function closeAdmin(){
+  $('admin-overlay').classList.remove('show');
+}
+$('admin-overlay').addEventListener('click', e => { if(e.target === $('admin-overlay')) closeAdmin(); });
+
+function switchAdminTab(tab, btn){
+  ['profils','fautes','params'].forEach(t => {
+    $('admin-tab-'+t).style.display = t === tab ? '' : 'none';
+  });
+  document.querySelectorAll('.admin-tab').forEach(b => b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  if(tab === 'params') renderAdminStats();
+}
+
+// ── Rendu liste profils admin ──
+function renderAdminProfils(){
+  const profiles = getProfiles();
+  const search = ($('admin-search')?.value || '').toLowerCase();
+  const keys = Object.keys(profiles).filter(k => {
+    const p = profiles[k];
+    const txt = (p.prenom + ' ' + p.nom + ' ' + p.matricule).toLowerCase();
+    return !search || txt.includes(search);
+  });
+
+  const list = $('admin-profils-list');
+  if(!list) return;
+
+  if(!keys.length){
+    list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted2);font-size:12px">Aucun profil trouvé.</div>';
+    return;
+  }
+
+  list.innerHTML = keys.map(k => {
+    const p = profiles[k];
+    const fautes = (p.fautes || []);
+    const photoEl = p.photo
+      ? `<img src="${p.photo}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,168,76,.4);flex-shrink:0">`
+      : `<div style="width:40px;height:40px;border-radius:50%;border:2px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;font-size:18px;background:rgba(0,0,0,.3);flex-shrink:0">👤</div>`;
+    const graviteCount = {mineure: 0, moderee: 0, grave: 0};
+    fautes.forEach(f => { if(f.gravite) graviteCount[f.gravite] = (graviteCount[f.gravite]||0)+1; });
+    const fauteBadge = fautes.length
+      ? `<span style="background:rgba(224,82,82,.15);border:1px solid rgba(224,82,82,.3);color:var(--red);border-radius:10px;padding:2px 8px;font-size:10px">⚠️ ${fautes.length} faute${fautes.length>1?'s':''}</span>`
+      : `<span style="background:rgba(76,175,130,.1);border:1px solid rgba(76,175,130,.3);color:var(--green);border-radius:10px;padding:2px 8px;font-size:10px">✓ Irréprochable</span>`;
+    return `<div class="admin-profile-card">
+      <div style="display:flex;align-items:center;gap:10px">
+        ${photoEl}
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'Cinzel',serif;font-size:13px;font-weight:700;color:var(--gold2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.prenom)} ${esc(p.nom)}</div>
+          <div style="font-size:10px;color:var(--muted2);letter-spacing:1px">${esc(p.matricule)}</div>
+          <div style="margin-top:4px">${fauteBadge}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+          <button class="admin-btn" style="font-size:10px;padding:4px 8px" onclick="openFiche(getProfiles()['${k}'])">👁 Fiche</button>
+          <button class="admin-btn" style="font-size:10px;padding:4px 8px" onclick="adminAddFaute('${k}')">⚠️ Faute</button>
+          <button class="admin-btn danger" style="font-size:10px;padding:4px 8px" onclick="adminDeleteProfile('${k}')">🗑</button>
+        </div>
+      </div>
+      ${fautes.length ? `<div style="margin-top:8px;border-top:1px solid rgba(255,255,255,.06);padding-top:8px">
+        ${fautes.slice(-2).map(f => `<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-bottom:3px">
+          <span style="color:${f.gravite==='grave'?'var(--red)':f.gravite==='moderee'?'#e8a84c':'var(--muted2)'}">${graviteIcon(f.gravite)} ${esc(f.txt)}</span>
+          <div style="display:flex;gap:4px;align-items:center">
+            <span style="color:var(--muted);font-size:10px">${esc(f.date)}</span>
+            <button onclick="adminRemoveFaute('${k}','${f.id||''}');event.stopPropagation()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0 2px" title="Supprimer">✕</button>
+          </div>
+        </div>`).join('')}
+        ${fautes.length > 2 ? `<div style="font-size:10px;color:var(--muted2);text-align:right">+ ${fautes.length-2} autre(s)…</div>` : ''}
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function graviteIcon(g){
+  if(g==='grave') return '🔴';
+  if(g==='moderee') return '⚠️';
+  return '⚡';
+}
+
+// ── Rendu liste fautes admin ──
+function renderAdminFautes(){
+  const profiles = getProfiles();
+  const filter = $('admin-faute-filter')?.value || '';
+
+  // Remplir le filtre
+  const filterSel = $('admin-faute-filter');
+  if(filterSel){
+    const curVal = filterSel.value;
+    filterSel.innerHTML = '<option value="">Tous les profils</option>' +
+      Object.values(profiles).map(p => `<option value="${p.id}" ${curVal===p.id?'selected':''}>${esc(p.prenom)} ${esc(p.nom)}</option>`).join('');
+  }
+
+  // Collecter toutes les fautes
+  let allFautes = [];
+  Object.values(profiles).forEach(p => {
+    (p.fautes||[]).forEach(f => {
+      allFautes.push({...f, profileId: p.id, profileName: p.prenom + ' ' + p.nom, profileMat: p.matricule});
+    });
+  });
+
+  if(filter) allFautes = allFautes.filter(f => f.profileId === filter);
+  allFautes.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+  const list = $('admin-fautes-list');
+  if(!list) return;
+
+  if(!allFautes.length){
+    list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--green);font-size:13px">✓ Aucune faute enregistrée</div>';
+    return;
+  }
+
+  list.innerHTML = allFautes.map(f => `
+    <div class="admin-faute-row">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:10px;color:var(--muted2);margin-bottom:3px;letter-spacing:1px">${esc(f.profileName)} · ${esc(f.profileMat)}</div>
+          <div style="font-size:12px;color:var(--text)">${graviteIcon(f.gravite)} ${esc(f.txt)}</div>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <span style="font-size:10px;color:var(--muted2)">📅 ${esc(f.date)}</span>
+            ${f.signaledBy ? `<span style="font-size:10px;color:var(--muted2)">👤 Signalé par: ${esc(f.signaledBy)}</span>` : ''}
+            <span style="font-size:10px;padding:1px 7px;border-radius:8px;background:${f.gravite==='grave'?'rgba(224,82,82,.15)':f.gravite==='moderee'?'rgba(232,168,76,.15)':'rgba(76,175,130,.1)'};color:${f.gravite==='grave'?'var(--red)':f.gravite==='moderee'?'#e8a84c':'var(--green)'}">${f.gravite||'mineure'}</span>
+          </div>
+        </div>
+        <button onclick="adminRemoveFaute('${f.profileId}','${f.id||''}');renderAdminFautes();renderAdminProfils()" style="background:none;border:1px solid rgba(224,82,82,.3);border-radius:4px;color:var(--red);cursor:pointer;font-size:11px;padding:3px 7px;flex-shrink:0">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderAdminStats(){
+  const profiles = getProfiles();
+  const pList = Object.values(profiles);
+  const totalFautes = pList.reduce((s,p) => s+(p.fautes||[]).length, 0);
+  const graves = pList.reduce((s,p) => s+(p.fautes||[]).filter(f=>f.gravite==='grave').length, 0);
+  const box = $('admin-stats-box');
+  if(!box) return;
+  box.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="admin-stat-card"><div style="font-size:22px;font-weight:700;color:var(--gold2)">${pList.length}</div><div style="font-size:10px;color:var(--muted2)">Profils</div></div>
+      <div class="admin-stat-card"><div style="font-size:22px;font-weight:700;color:var(--red)">${totalFautes}</div><div style="font-size:10px;color:var(--muted2)">Fautes totales</div></div>
+      <div class="admin-stat-card"><div style="font-size:22px;font-weight:700;color:#e8a84c">${pList.filter(p=>(p.fautes||[]).length>0).length}</div><div style="font-size:10px;color:var(--muted2)">Avec fautes</div></div>
+      <div class="admin-stat-card"><div style="font-size:22px;font-weight:700;color:var(--red)">${graves}</div><div style="font-size:10px;color:var(--muted2)">Fautes graves</div></div>
+    </div>`;
+}
+
+// ── Ajouter une faute depuis admin ──
+function adminAddFaute(profileId){
+  const p = getProfiles()[profileId];
+  if(!p) return;
+  openFauteModal(profileId, true); // true = mode admin (pas de restriction)
+}
+
+function adminDeleteProfile(profileId){
+  if(!confirm('Supprimer définitivement ce profil et toutes ses fautes ?')) return;
+  const profiles = getProfiles();
+  delete profiles[profileId];
+  localStorage.setItem('cdp_profiles', JSON.stringify(profiles));
+  toast('Profil supprimé.');
+  renderAdminProfils();
+  renderAdminFautes();
+}
+
+function adminRemoveFaute(profileId, fauteId){
+  const profiles = getProfiles();
+  const p = profiles[profileId];
+  if(!p) return;
+  p.fautes = (p.fautes||[]).filter(f => f.id !== fauteId);
+  localStorage.setItem('cdp_profiles', JSON.stringify(profiles));
+  renderAdminProfils();
+  renderAdminFautes();
+  toast('Faute supprimée.');
+}
+
+function changeAdminPwd(){
+  const newPwd = $('admin-new-pwd')?.value?.trim();
+  if(!newPwd || newPwd.length < 4){ toast('Mot de passe trop court (min 4 caractères)'); return; }
+  localStorage.setItem(ADMIN_PWD_KEY, newPwd);
+  $('admin-new-pwd').value = '';
+  toast('✦ Mot de passe admin changé !');
+}
+
+function deleteAllProfiles(){
+  localStorage.removeItem('cdp_profiles');
+  toast('Tous les profils supprimés.');
+  renderAdminProfils();
+  renderAdminFautes();
+}
+
+function deleteAllFautes(){
+  const profiles = getProfiles();
+  Object.values(profiles).forEach(p => { p.fautes = []; });
+  localStorage.setItem('cdp_profiles', JSON.stringify(profiles));
+  toast('Toutes les fautes supprimées.');
+  renderAdminProfils();
+  renderAdminFautes();
+}
+
+// ═══════════════════════════════════════════════════════
+// MODAL SIGNALER UNE FAUTE (pour utilisateurs normaux)
+// ═══════════════════════════════════════════════════════
+
+function openFauteModal(profileId, isAdmin){
+  const p = getProfiles()[profileId];
+  if(!p) return;
+  fauteTargetProfileId = profileId;
+  $('faute-target-name').textContent = p.prenom + ' ' + p.nom;
+  $('faute-target-mat').textContent = p.matricule;
+  $('faute-desc-inp').value = '';
+  $('faute-gravite-inp').value = 'mineure';
+  $('faute-modal-err').style.display = 'none';
+  // Date d'aujourd'hui par défaut
+  const today = new Date().toISOString().split('T')[0];
+  $('faute-date-inp').value = today;
+  $('faute-modal').classList.add('show');
+  setTimeout(() => $('faute-desc-inp').focus(), 150);
+}
+
+function closeFauteModal(){
+  $('faute-modal').classList.remove('show');
+  fauteTargetProfileId = null;
+}
+$('faute-modal').addEventListener('click', e => { if(e.target === $('faute-modal')) closeFauteModal(); });
+
+function submitFaute(){
+  const desc = $('faute-desc-inp').value.trim();
+  const date = $('faute-date-inp').value;
+  const gravite = $('faute-gravite-inp').value;
+  const errEl = $('faute-modal-err');
+
+  if(!desc){ errEl.textContent = '❌ Décris la faute svp'; errEl.style.display = ''; return; }
+  if(!date){ errEl.textContent = '❌ Indique une date'; errEl.style.display = ''; return; }
+  if(!fauteTargetProfileId){ errEl.textContent = '❌ Aucune cible'; errEl.style.display = ''; return; }
+
+  const profiles = getProfiles();
+  const p = profiles[fauteTargetProfileId];
+  if(!p){ errEl.textContent = '❌ Profil introuvable'; errEl.style.display = ''; return; }
+
+  if(!p.fautes) p.fautes = [];
+  const fauteId = 'f_' + Date.now();
+  p.fautes.push({
+    id: fauteId,
+    txt: desc,
+    date: date,
+    gravite: gravite,
+    signaledBy: isAdminSession() ? 'Admin' : 'Utilisateur',
+    signaledAt: new Date().toISOString()
+  });
+  localStorage.setItem('cdp_profiles', JSON.stringify(profiles));
+
+  closeFauteModal();
+  toast('⚠️ Faute signalée pour ' + p.prenom + ' ' + p.nom + ' !');
+
+  // Refresh les vues ouvertes
+  if($('admin-overlay').classList.contains('show')){
+    renderAdminProfils();
+    renderAdminFautes();
+  }
+}
+
+// ── Bouton "Signaler une faute" dans la fiche scannée ──
+// On override openFiche pour ajouter le bouton
+const _origOpenFiche = openFiche;
+function openFiche(p){
+  if(!p) return;
+  _origOpenFiche(p);
+  // Ajouter le bouton "Signaler une faute" en bas de la fiche
+  const fc = $('fiche-content');
+  if(!fc) return;
+  // Trouver le bouton Fermer et insérer avant
+  const closeBtnDiv = fc.querySelector('div[style*="text-align:center"]');
+  if(closeBtnDiv && p.id){
+    const signalBtn = document.createElement('div');
+    signalBtn.style.cssText = 'text-align:center;margin-bottom:10px';
+    signalBtn.innerHTML = `<button onclick="openFauteModal('${p.id}');closeFiche()" style="background:rgba(224,82,82,.12);border:1px solid rgba(224,82,82,.4);border-radius:8px;color:var(--red);font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;padding:8px 18px;cursor:pointer">⚠️ SIGNALER UNE FAUTE</button>`;
+    closeBtnDiv.parentNode.insertBefore(signalBtn, closeBtnDiv);
+  }
+}
+
+// ── Même chose pour la fiche dans le scanner ──
+function showProfileInScanner_withFaute(profile){
+  showProfileResult(profile);
+  // Ajouter bouton signaler dans la zone scanner-result
+  const res = $('scanner-result');
+  if(res && profile.id){
+    const btn = document.createElement('div');
+    btn.style.cssText = 'margin-top:8px;text-align:center';
+    btn.innerHTML = `<button onclick="openFauteModal('${profile.id}')" style="background:rgba(224,82,82,.12);border:1px solid rgba(224,82,82,.4);border-radius:7px;color:var(--red);font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;padding:6px 14px;cursor:pointer;width:100%">⚠️ SIGNALER UNE FAUTE</button>`;
+    res.appendChild(btn);
+  }
+}
+
+// ── Injecter bouton Admin dans la topbar ──
+function injectAdminBtn(){
+  const tb = document.querySelector('.topbar');
+  if(!tb) return;
+  const spacer = tb.querySelector('.spacer');
+  if(!spacer) return;
+  const adminBtn = document.createElement('button');
+  adminBtn.className = 'tbtn';
+  adminBtn.style.cssText = 'border-color:rgba(201,168,76,.4);color:var(--gold2);font-weight:700';
+  adminBtn.innerHTML = '🛡️ Admin';
+  adminBtn.onclick = openAdminPanel;
+  tb.insertBefore(adminBtn, spacer);
+
+  // Aussi ajouter dans mob toolbar
+  const mobTabs = document.querySelector('.mob-tabs');
+  if(mobTabs){
+    const adminTab = document.createElement('button');
+    adminTab.className = 'mob-tab';
+    adminTab.innerHTML = '<span class="mob-ico">🛡️</span><span>Admin</span>';
+    adminTab.onclick = openAdminPanel;
+    mobTabs.appendChild(adminTab);
+  }
+}
+
+injectAdminBtn();
+
 </script>
 </body>
 </html>
